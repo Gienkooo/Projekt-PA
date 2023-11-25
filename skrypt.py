@@ -4,7 +4,6 @@ import dash
 from dash import html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
-
 import matplotlib.pyplot as plt
 
 def e(v, sv):
