@@ -2,7 +2,7 @@ import math
 import plotly.graph_objects as go
 import dash 
 from dash import html
-import dash_core_components as dcc
+from dash import dcc
 import dash_bootstrap_components as dbc
 import matplotlib.pyplot as plt
 
@@ -48,7 +48,9 @@ def air_drag(v):
 def wind_force(v, wind_v):
     return air_drag(v + wind_v)
 
-
+#vehicle parameters
+#surrounding
+#simulation parameters
 air_density = 1.293
 frontal_area = 1.89
 wind_res_coef = 0.36
@@ -127,7 +129,7 @@ plt.subplot(3, 2, 6)
 plt.plot(time_array, e_arr, label="e")
 plt.legend()
 
-plt.show()
+#plt.show()
 
 
 def function1(x, p1):
@@ -193,7 +195,8 @@ app.layout = dbc.Container(
                                 max=max2,
                                 step=1,
                                 value=value2,
-                                marks={i: str(i) for i in range(min2, max2+1)}
+                                marks={i: str(i) for i in range(min2, max2+1)},
+                                tooltip={"placement" : "bottom", "always_visible" : True}
                             ),
                             html.H3("parametr3:"),
                             dcc.Slider(
@@ -228,23 +231,31 @@ app.layout = dbc.Container(
 )
 
 @app.callback(
-    [
-        dash.dependencies.Output('wykres1', 'figure'),
-        dash.dependencies.Output('wykres2', 'figure'),
-        dash.dependencies.Output('wykres3', 'figure'),
+    [   
         dash.dependencies.Output('slider1', 'value'),
         dash.dependencies.Output('slider2', 'value'),
         dash.dependencies.Output('slider3', 'value'),
+        dash.dependencies.Output('slider1', 'disabled'),
+        dash.dependencies.Output('slider2', 'disabled'),
+        dash.dependencies.Output('slider3', 'disabled'),
+        dash.dependencies.Output('wykres1', 'figure'),
+        dash.dependencies.Output('wykres2', 'figure'),
+        dash.dependencies.Output('wykres3', 'figure')
     ],
     [
+        dash.dependencies.Input('dropdown_menu', 'value'),
         dash.dependencies.Input('slider1', 'value'),
         dash.dependencies.Input('slider2', 'value'),
-        dash.dependencies.Input('slider3', 'value'),
-        dash.dependencies.Input('dropdown_menu', 'value')
+        dash.dependencies.Input('slider3', 'value')
     ]
 )
 
-def update_graphs(p1, p2, p3, selected_model):
+def update_graphs(selected_model, p1, p2, p3):
+    if selected_model== 'opt1' or selected_model == 'opt2':
+        movable_sliders = True
+    else:
+        movable_sliders = False
+
     if selected_model == 'opt1':
         p1, p2, p3 = 1, 2, 3
     elif selected_model == 'opt2':
@@ -278,8 +289,10 @@ def update_graphs(p1, p2, p3, selected_model):
     fig2 = go.Figure(data=[trace2], layout=layout2)
     fig3 = go.Figure(data=[trace3], layout=layout3)
 
-    return fig1, fig2, fig3, p1, p2, p3
-
+    if movable_sliders:
+        return p1, p2, p3, True, True, True, fig1, fig2, fig3
+    else:
+        return p1, p2, p3, False, False, False, fig1, fig2, fig3
 
 if __name__ == '__main__':
     app.run_server(port = 4050)
