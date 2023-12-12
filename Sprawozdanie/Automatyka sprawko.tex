@@ -1,0 +1,141 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[polish]{babel}
+\begin{document}
+	\title{Tempomat - symulacja}
+	\author{Anna Zalesińska, 155868 \\ Mateusz Juszczak, 155968}
+	\date{}
+	\maketitle
+	\section{Wstęp}
+	Celem niniejszego projektu jest implementacja oraz analiza symulatora tempomatu opartego o regulator proporcjonalno-całkująco-różniczkujący (PID). W dzisiejszych czasach, systemy kontroli prędkości, takie jak tempomaty, stanowią integralną część współczesnych pojazdów, wpływając istotnie na komfort jazdy oraz efektywność energetyczną. Regulacja PID, ze względu na swoją prostotę i skuteczność, jest powszechnie stosowaną metodą w projektowaniu systemów sterowania.
+	
+	W ramach projektu skupiamy się na stworzeniu symulatora tempomatu, który umożliwi zrozumienie oraz ocenę działania regulatora PID w kontekście utrzymania zadanej prędkości pojazdu. Implementacja symulatora pozwoli na eksperymentalne zbadanie wpływu różnych parametrów regulatora PID na stabilność, czas regulacji oraz ogólną wydajność systemu.
+	
+	Wprowadzenie regulatora PID do układu tempomatu ma na celu eliminację błędów systemowych poprzez odpowiednią korektę sygnału sterującego. Regulator ten składa się z trzech składowych: proporcjonalnej (P), całkującej (I) oraz różniczkującej (D), które łącznie pozwalają na skuteczne utrzymanie pojazdu w zadanym tempie jazdy.
+	
+	\section{Model matematyczny}
+	Parametry determinujące przebieg sumulacji można podzielić na trzy kategorie kategorie: parametry środowiska, parametry obiektu oraz parametry symulacji.
+	
+	\subsection{Parametry środowiska}
+		\begin{center}
+			\begin{tabular}{|c|c|c|}
+				\hline
+				Symbol & Jednostka & Opis \\
+				\hline
+				\hline
+				$func(x)$ & 1 & Funkcja trasy \\
+				\hline
+				$\rho$ & $\frac{kg}{m^3}$ & Gęstość powietrza \\
+				\hline
+				$g$ & $\frac{m}{s^2}$ & Przyspieszenie grawitacyjne\\
+				\hline
+				$v_w$ & $\frac{m}{s}$ & Prędkość wiatru \\
+				\hline
+				$\alpha_w$ & 1 deg(°) & Kąt wiania wiatru \\
+				\hline
+			\end{tabular}
+		\end{center}
+	
+	\subsection{Parametry obiektu}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Symbol & Jednostka & Opis \\
+			\hline
+			\hline
+			$A$ & $m^2$ & Powierzchnia czołowa \\
+			\hline
+			$\mu$ & 1 & Współczynnik oporu toczenia \\
+			\hline
+			$C_d$ & 1 & Współczynnik oporu aerodynamicznego \\
+			\hline
+			$m$ & $kg$ & Masa pojazdu \\
+			\hline
+			$r$ & $m$ & Promień koła \\
+			\hline
+			$M_l$ & $Nm$ & Maksymalny moment siły silnika \\
+			\hline
+		\end{tabular}
+	\end{center}
+
+	\subsection{Parametry symulacji}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Symbol & Jednostka & Opis \\
+			\hline
+			\hline
+			$e$ & $\frac{m}{s}$ & Uchyb \\
+			\hline
+			$t$ & $s$ & Czas symulacji \\
+			\hline
+			$t_s$ & $s$ & Krok symulacji \\
+			\hline
+			$v_s$ & $\frac{m}{s}$ & Prędkość zadana \\
+			\hline
+			$v_0$ & $\frac{m}{s}$ & Prędkość początkowa \\
+			\hline
+			$v$ & $\frac{m}{s}$ & Prędkość chwilowa obiektu \\
+			\hline
+			$x_0$ & $m$ & Położenie początkowe \\
+			\hline
+			$\alpha_s$ & 1 deg(°) & Nachylenie zbocza \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	\subsection{Parametry dynamiczne}
+	Wartości niektórych parametrów podstawowych są wsprost zależne od aktualnego stanu symulacji. Ich wartości obliczane są podczas każdej iteracji.
+	
+	\begin{itemize}
+		\item Nachylenie zbocza - $\alpha$ \\
+		\[
+		\alpha = atan \left( \frac{func(x) - func(x - vt_s - 0.1)}{t_s} \right)
+		\]
+		Parametr jest obliczany jako współczynnik kierunkowy prostej przechodzącej przez punkt aktualnego oraz następnego położenia obiektu z dodatkiem małego, arbitralnie wybranego czynnika skalarnego o wartości 0.1, aby umożliwić poprawne obliczenie tego parametru w sytuacji gdy $v = 0$.
+		\item Uchyb - $e$
+		\[
+			e = v_s - v
+		\]
+		\item Moment sumulacji - $t_e$
+		\[
+			t_e = n t_s
+		\]
+		Gdzie $n$ to liczba wykonanych iteracji symulacji
+	\end{itemize}
+	
+	\subsection{Siły działające na obiekt}
+	Podczas symulacji, obiekt poddawany jest wybranym siłom, których wartości są krokowo obliczane. Zależą one zarówno od wartości parametrów ustawionych przez użytkownika, jak i obecnego stanu symulacji.
+	\begin{enumerate}
+		\item Siła staczania
+		\[
+			F_s = mgsin\left(\alpha\frac{\pi}{180°}\right)
+		\]
+		\item Opór toczenia
+		\[
+			F_t = mg\mu cos\left(\alpha\frac{\pi}{180°}\right)
+		\]
+		\item Opór wiatru
+		\[
+			F_w = \frac{1}{2} C_d A \rho v^2
+		\]
+		\item Opór aerodynamiczny
+		\[
+			F_a = \frac{1}{2} C_d A \rho (v - v_wcos(\alpha_w\frac{\pi}{180°}))^2
+		\]
+		\item Siła silnika
+		\[
+			F_m = max\left(-\frac{M_l}{r} ,min\left(\frac{M_l}{r}, \frac{mkp\left(e(t_e) + \frac{1}{T_i}\int_{-\infty}^{t_s}e(t_i)dt_i + T_d(e(t_e) - e(t_e - t_s))\right)}{t_s}\right)\right)
+		\]
+		Więcej na temat regulatora w następnej sekcji.
+	\end{enumerate}
+	Z wymienionych sił obliczana jest siła wypadkowa.
+	\[
+		F = F_m - F_s - F_t - F_w - F_a
+	\]
+	
+\end{document}
