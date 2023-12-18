@@ -56,6 +56,9 @@ model_1_rolling_res_coef = 0.05
 model_1_vehicle_mass = 1450
 model_1_wheel_radius = 0.35
 model_1_max_torque = 420
+model_1_kp = 2
+model_1_ti = 10
+model_1_td = 0.06
 
 #ford super duty
 model_2_frontal_area = 2.8
@@ -64,6 +67,10 @@ model_2_rolling_res_coef = 0.007
 model_2_vehicle_mass = 2600
 model_2_wheel_radius = 0.38
 model_2_max_torque = 1600.0
+model_2_kp = 2
+model_2_ti = 14.4
+model_2_td = 0.05
+
 
 #volkswagen up
 model_3_frontal_area = 1.7
@@ -136,7 +143,7 @@ kp = 2
 ti = 0.01
 td = 0.05
 
-min_t = 200
+min_t = 10
 min_ts = 1
 min_set_vel = 0
 min_start_vel = 0
@@ -152,7 +159,7 @@ max_start_vel = 50
 max_start_pos = 0
 max_kp = 10
 max_ti = 100
-max_td = 1
+max_td = 0.25
 max_force = generated_force(max_torque)
 
 time_array = [0]
@@ -490,7 +497,7 @@ app.layout = dbc.Container(
                         id='s_slider8',
                         min=min_td,
                         max=max_td,
-                        step=0.01,
+                        step=0.001,
                         value=td,
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
