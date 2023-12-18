@@ -3,7 +3,6 @@ import plotly.graph_objects as go
 import dash 
 from dash import html, dcc, Input, Output
 import dash_bootstrap_components as dbc
-import matplotlib.pyplot as plt
 
 def e(v, sv):
     return v - sv
@@ -50,21 +49,29 @@ def wind_force(v, wind_v):
 def route_manip(x):
     return math.atan(x / 400) * 10
 
-#vehicle model 1 parameters
-model_1_frontal_area = 1.89
-model_1_wind_res_coef = 0.36
-model_1_rolling_res_coef = 0.012
-model_1_vehicle_mass = 2000
-model_1_wheel_radius = 0.2159
-model_1_max_torque = 200
+#passat vlkswagen
+model_1_frontal_area = 2.1
+model_1_wind_res_coef = 0.29
+model_1_rolling_res_coef = 0.05
+model_1_vehicle_mass = 1450
+model_1_wheel_radius = 0.35
+model_1_max_torque = 420
 
-#vehicle model 2 parameters
-model_2_frontal_area = 1.89
-model_2_wind_res_coef = 0.36
-model_2_rolling_res_coef = 0.012
-model_2_vehicle_mass = 2000
-model_2_wheel_radius = 0.2159
-model_2_max_torque = 200
+#ford super duty
+model_2_frontal_area = 2.8
+model_2_wind_res_coef = 0.33
+model_2_rolling_res_coef = 0.007
+model_2_vehicle_mass = 2600
+model_2_wheel_radius = 0.38
+model_2_max_torque = 1600.0
+
+#volkswagen up
+model_3_frontal_area = 1.7
+model_3_wind_res_coef = 0.32
+model_3_rolling_res_coef = 0.004
+model_3_vehicle_mass = 1080
+model_3_wheel_radius = 0.30
+model_3_max_torque = 230.0
 
 #vehicle parameters
 frontal_area = 1.89
@@ -77,18 +84,23 @@ max_torque = 200
 min_frontal_area = 1.0
 min_wind_res_coef = 0.0
 min_rolling_res_coef = 0.0
-min_vehicle_mass = 500.0
+min_vehicle_mass = 1000.0
 min_wheel_radius = 0.1
-min_max_torque = 100.0
+min_max_torque = 0.0
 
 max_frontal_area = 3.0
 max_wind_res_coef = 1.0
 max_rolling_res_coef = 1.0
-max_vehicle_mass = 3000.0
+max_vehicle_mass = 5000.0
 max_wheel_radius = 1.0
-max_max_torque = 300.0
+max_max_torque = 2500.0
 
 #enviorment parameters
+default_air_density = 0.0
+default_g = 9.0
+default_wind_speed = 0.0
+default_wind_angle = 0.0
+
 route_func = route_manip
 air_density = 1.293
 g = 9.80665
@@ -106,27 +118,41 @@ max_wind_speed = 10.0
 max_wind_angle = 10.0
 
 #simulation parameters
+default_t = 250
+default_ts = 1
+default_set_vel = 10
+default_start_vel = 0
+default_start_pos = -1000
+default_kp = 2
+default_ti = 0.01
+default_td = 0.05
+
 t = 250
 ts = 1
 set_vel = 10
 start_vel = 0
 start_pos = -1000
+kp = 2
+ti = 0.01
+td = 0.05
 
 min_t = 200
 min_ts = 1
 min_set_vel = 0
 min_start_vel = 0
 min_start_pos = -1000
+min_kp = 0.1
+min_ti = 0.1
+min_td = 0.01
 
 max_t = 300
 max_ts = 5
 max_set_vel = 50
 max_start_vel = 50
 max_start_pos = 0
-
-kp = 0.1
-ki = 0.01
-kd = 0.05
+max_kp = 10
+max_ti = 100
+max_td = 1
 max_force = generated_force(max_torque)
 
 time_array = [0]
@@ -140,13 +166,14 @@ F_arr = [0]
 slope_arr = [slope(route_func, pos_arr[-1], 1)]
 rolldown_arr = [rolldown(slope_arr[-1])]
 
-def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
+def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
     global frontal_area
     global wind_res_coef
     global rolling_res_coef
     global vehicle_mass 
     global wheel_radius 
-    global max_torque 
+    global max_torque
+    global max_force 
     global route_func 
     global air_density 
     global g
@@ -157,12 +184,14 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     global set_vel
     global start_vel
     global start_pos
+    global kp, ti, td
     frontal_area = v1
     wind_res_coef = v2
     rolling_res_coef = v3
     vehicle_mass = v4
     wheel_radius = v5
     max_torque = v6
+    max_force = generated_force(max_torque)
     route_func = route_manip
     air_density = e1
     g = e2
@@ -170,12 +199,15 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     wind_angle = e4
     t = s1
     ts = s2
-    set_vel = s3
-    start_vel = s4
+    start_vel = s3
+    set_vel = s4
     start_pos = s5
+    kp = s6
+    ti = s7
+    td = s8
 
-def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
-    set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5)
+def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
+    set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
     global time_array 
     global vel_arr
     global pos_arr
@@ -201,7 +233,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
         es_arr.append(es_arr[-1] + e_arr[-1])
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
-        F_motor = max(-max_force, min(max_force, (kp * e_arr[-1] + ki * es_arr[-1] + kd * (e_arr[-2] - e_arr[-1]) / ts) * vehicle_mass / ts))
+        F_motor = max(-max_force, min(max_force, kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) * vehicle_mass / ts))
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
         F_wind = wind_force(vel_arr[-1], perpendicular_component(wind_speed, math.radians(wind_angle)))
@@ -223,9 +255,11 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 traces = [[], [], []]
 last_clr_n_clicks = 0
 last_add_n_clicks = 0
+last_s_param_clickas = 0
 
-def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
-    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5)
+
+def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
+    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
     new_trace1 = go.Scatter(
         x=time_array,
         y=vel_arr,
@@ -245,8 +279,8 @@ def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
     traces[1].append(new_trace2)
     traces[2].append(new_trace3)
 
-def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
-    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5)
+def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
+    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
     if traces[0] and traces[1] and traces[2]:
         traces[0][-1]['y'] = vel_arr
         traces[1][-1]['y'] = F_arr
@@ -267,8 +301,9 @@ app.layout = dbc.Container(
                         options=
                         [
                             {'label':'custom', 'value' : 'opt1'},
-                            {'label':'model 1', 'value' : 'opt2'},
-                            {'label':'model 2', 'value' : 'opt3'}
+                            {'label':'volkswagen passat', 'value' : 'opt2'},
+                            {'label':'ford super duty', 'value' : 'opt3'},
+                            {'label':'volkswagen up', 'value' : 'opt4'}
                         ],
                         value='opt1'
                     ),
@@ -279,7 +314,7 @@ app.layout = dbc.Container(
                         max=max_frontal_area,
                         step=0.01,
                         value=frontal_area,
-                        marks=None,
+                        marks={min_frontal_area : str(min_frontal_area), max_frontal_area : str(max_frontal_area)},
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
                     html.Label('współczynnik oporu toczenia:'),
@@ -333,6 +368,9 @@ app.layout = dbc.Container(
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
                     html.H5("parametry środowiska"),
+                    dbc.Row(
+                    html.Button('resetuj parametry środowiska', id='e_param-button', n_clicks=0)
+                    ),
                     html.Label('gęstość powietrza:'),
                     dcc.Slider(
                         id='e_slider1',
@@ -374,25 +412,8 @@ app.layout = dbc.Container(
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
                     html.H5("parametry symulacji"),
-                    html.Label('czas symulacji:'),
-                    dcc.Slider(
-                        id='s_slider1',
-                        min=min_t,
-                        max=max_t,
-                        step=1,
-                        value=t,
-                        marks=None,
-                        tooltip={"placement" : "bottom", "always_visible" : True}
-                    ),
-                    html.Label('krok symulacji:'),
-                    dcc.Slider(
-                        id='s_slider2',
-                        min=min_ts,
-                        max=max_ts,
-                        step=1,
-                        value=ts,
-                        marks=None,
-                        tooltip={"placement" : "bottom", "always_visible" : True}
+                    dbc.Row(
+                        html.Button('resetuj parametry symulacji', id='s_param-button', n_clicks=0)
                     ),
                     html.Label('prędkość początkowa:'),
                     dcc.Slider(
@@ -424,21 +445,73 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Button('Add Trace', id='add-button', n_clicks=0),
-                    html.Button('Clear', id='clr-button', n_clicks=0)
-                    ], style={'width': '50%', 'margin': 'auto'}),
+                    html.Label('czas symulacji:'),
+                    dcc.Slider(
+                        id='s_slider1',
+                        min=min_t,
+                        max=max_t,
+                        step=1,
+                        value=t,
+                        marks=None,
+                        tooltip={"placement" : "bottom", "always_visible" : True}
+                    ),
+                    html.Label('krok symulacji:'),
+                    dcc.Slider(
+                        id='s_slider2',
+                        min=min_ts,
+                        max=max_ts,
+                        step=1,
+                        value=ts,
+                        marks=None,
+                        tooltip={"placement" : "bottom", "always_visible" : True}
+                    ),
+                    html.Label('k_p:'),
+                    dcc.Slider(
+                        id='s_slider6',
+                        min=min_kp,
+                        max=max_kp,
+                        step=0.1,
+                        value=kp,
+                        marks=None,
+                        tooltip={"placement" : "bottom", "always_visible" : True}
+                    ),
+                    html.Label('T_i:'),
+                    dcc.Slider(
+                        id='s_slider7',
+                        min=min_ti,
+                        max=max_ti,
+                        step=0.1,
+                        value=ti,
+                        marks=None,
+                        tooltip={"placement" : "bottom", "always_visible" : True}
+                    ),
+                    html.Label('T_d:'),
+                    dcc.Slider(
+                        id='s_slider8',
+                        min=min_td,
+                        max=max_td,
+                        step=0.01,
+                        value=td,
+                        marks=None,
+                        tooltip={"placement" : "bottom", "always_visible" : True}
+                    ),
+                    dbc.Row([
+                        html.Button('dodaj ślad', id='add-button', n_clicks=0),
+                        html.Button('wyczyść wykresy', id='clr-button', n_clicks=0)
+                    ]),
+                    ], style={'width': '100%', 'margin': 10}),
                 ],
-                width=6
+                width=4
             ),
             dbc.Col(
                 html.Div([
                 dcc.Graph(id='graph-1', figure={'data': [], 'layout': go.Layout(title='y = ax')}),
                 dcc.Graph(id='graph-2', figure={'data': [], 'layout': go.Layout(title='y = a*-x')}),
                 dcc.Graph(id='graph-3', figure={'data': [], 'layout': go.Layout(title='y = x*x + a')}),
-                ]),
-                width=6
+                ], style={'width': '100%', 'margin': 10}),
+                width=8
             )
-        ])
+        ], style={'width': '100%', 'margin': 10})
     ]
 )
 
@@ -478,17 +551,20 @@ app.layout = dbc.Container(
         Input('s_slider2', 'value'),
         Input('s_slider3', 'value'),
         Input('s_slider4', 'value'),
-        Input('s_slider5', 'value')
+        Input('s_slider5', 'value'),
+        Input('s_slider6', 'value'),
+        Input('s_slider7', 'value'),
+        Input('s_slider8', 'value')
      ]
 )
-def update_graph(dropdown, add_n_clicks, clr_n_clicks, v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5):
+def update_graph(dropdown, add_n_clicks, clr_n_clicks, v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
     global last_clr_n_clicks, last_add_n_clicks, traces
 
     if add_n_clicks != last_add_n_clicks:
-        add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5)
+        add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
         last_add_n_clicks = add_n_clicks
     else:
-        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5)
+        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
 
     if clr_n_clicks != last_clr_n_clicks:
         traces = [[], [], []]
@@ -512,7 +588,14 @@ def update_graph(dropdown, add_n_clicks, clr_n_clicks, v1, v2, v3, v4, v5, v6, e
             v4 = model_2_vehicle_mass
             v5 = model_2_wheel_radius
             v6 = model_2_max_torque
-        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5)
+        elif dropdown == 'opt4':
+            v1 = model_3_frontal_area
+            v2 = model_3_wind_res_coef
+            v3 = model_3_rolling_res_coef
+            v4 = model_3_vehicle_mass
+            v5 = model_3_wheel_radius
+            v6 = model_3_max_torque
+        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
     
     figures = [
         {'data': traces[0], 'layout': go.Layout(title='prędkość')},
