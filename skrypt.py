@@ -130,8 +130,8 @@ default_ts = 1
 default_set_vel = 10
 default_start_vel = 0
 default_start_pos = -1000
-default_kp = 2
-default_ti = 0.01
+default_kp = 0.1
+default_ti = 35
 default_td = 0.05
 
 t = 250 #s
