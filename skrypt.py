@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import plotly.graph_objects as go
 import dash 
 from dash import html, dcc, Input, Output
@@ -46,8 +47,14 @@ def air_drag(v):
 def wind_force(v, wind_v):
     return air_drag(v + wind_v)
 
-def route_manip(x):
+def route_arc_tan(x):
     return math.atan(x / 400) * 10
+
+def route_sin(x):
+    return math.sin(x / 400) * 5
+
+def route_sin_harmonic(x):
+    return ((math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420)) * 5)
 
 #passat vlkswagen
 model_1_frontal_area = 2.1
@@ -96,12 +103,12 @@ max_wheel_radius = 1.0
 max_max_torque = 2500.0
 
 #enviorment parameters
-default_air_density = 0.0
-default_g = 9.0
+default_air_density = 1.293
+default_g = 9.80665
 default_wind_speed = 0.0
 default_wind_angle = 0.0
 
-route_func = route_manip
+route_func = route_arc_tan
 air_density = 1.293
 g = 9.80665
 wind_speed = 0
@@ -115,7 +122,7 @@ min_wind_angle = 0.0
 max_air_density = 5.0
 max_g = 10.0
 max_wind_speed = 10.0
-max_wind_angle = 10.0
+max_wind_angle = 360.0
 
 #simulation parameters
 default_t = 250
@@ -127,17 +134,17 @@ default_kp = 2
 default_ti = 0.01
 default_td = 0.05
 
-t = 250
-ts = 1
-set_vel = 10
+t = 250 #s
+ts = 1 #s
+set_vel = 10 #
 start_vel = 0
 start_pos = -1000
 kp = 2
 ti = 0.01
 td = 0.05
 
-min_t = 200
-min_ts = 1
+min_t = 100
+min_ts = 0.1
 min_set_vel = 0
 min_start_vel = 0
 min_start_pos = -1000
@@ -145,8 +152,8 @@ min_kp = 0.1
 min_ti = 0.1
 min_td = 0.01
 
-max_t = 300
-max_ts = 5
+max_t = 500
+max_ts = 10
 max_set_vel = 50
 max_start_vel = 50
 max_start_pos = 0
@@ -166,7 +173,7 @@ F_arr = [0]
 slope_arr = [slope(route_func, pos_arr[-1], 1)]
 rolldown_arr = [rolldown(slope_arr[-1])]
 
-def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
+def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     global frontal_area
     global wind_res_coef
     global rolling_res_coef
@@ -174,7 +181,6 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     global wheel_radius 
     global max_torque
     global max_force 
-    global route_func 
     global air_density 
     global g
     global wind_speed 
@@ -182,6 +188,7 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     global t
     global ts
     global set_vel
+    global route_func
     global start_vel
     global start_pos
     global kp, ti, td
@@ -192,7 +199,7 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     wheel_radius = v5
     max_torque = v6
     max_force = generated_force(max_torque)
-    route_func = route_manip
+    route_func = route
     air_density = e1
     g = e2
     wind_speed = e3
@@ -206,18 +213,9 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     ti = s7
     td = s8
 
-def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
-    set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
-    global time_array 
-    global vel_arr
-    global pos_arr
-    global h_arr
-    global e_arr
-    global es_arr
-    global a_arr
-    global F_arr
-    global slope_arr
-    global rolldown_arr
+def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, F_arr, slope_arr, rolldown_arr, route_func
     time_array = [0]
     vel_arr = [start_vel]
     pos_arr = [start_pos]
@@ -252,43 +250,56 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-traces = [[], [], []]
+traces = [[], [], [], []]
 last_clr_n_clicks = 0
 last_add_n_clicks = 0
-last_s_param_clickas = 0
+last_s_param_clicks = 0
+last_e_param_clicks = 0
+start = True
 
+layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]'),xaxis=dict(title='t [s]'))
+layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]'),xaxis=dict(title='t [s]'))
+layout3 = go.Layout(title='przyspieszenie pojazdu a(t)',yaxis=dict(title=u'a [m/s²]'),xaxis=dict(title='t [s]'))
+layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]'),xaxis=dict(title='t [s]'))
 
-def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
-    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
+def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     new_trace1 = go.Scatter(
-        x=time_array,
-        y=vel_arr,
+        x=[i for i in range(max_t + 1)],
+        y=h_arr,
         mode='lines',
     )
     new_trace2 = go.Scatter(
-        x=time_array,
-        y=F_arr,
+        x=[i for i in range(max_t + 1)],
+        y=vel_arr,
         mode='lines',
     )
     new_trace3 = go.Scatter(
-        x=time_array,
-        y=slope_arr,
+        x=[i for i in range(max_t + 1)],
+        y=a_arr,
+        mode='lines',
+    )
+    new_trace4 = go.Scatter(
+        x=[i for i in range(max_t + 1)],
+        y=e_arr,
         mode='lines',
     )
     traces[0].append(new_trace1)
     traces[1].append(new_trace2)
     traces[2].append(new_trace3)
+    traces[3].append(new_trace4)
 
-def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
-    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
+def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     if traces[0] and traces[1] and traces[2]:
-        traces[0][-1]['y'] = vel_arr
-        traces[1][-1]['y'] = F_arr
-        traces[2][-1]['y'] = slope_arr
+        traces[0][-1]['y'] = h_arr
+        traces[1][-1]['y'] = vel_arr
+        traces[2][-1]['y'] = a_arr
+        traces[3][-1]['y'] = e_arr
 
-        
 app.layout = dbc.Container(
-    [
+    fluid=True,
+    children=[
         html.H1("TEMPOMAT"),
         dbc.Row([
             dbc.Col(
@@ -300,14 +311,14 @@ app.layout = dbc.Container(
                         id='dropdown_menu',
                         options=
                         [
-                            {'label':'custom', 'value' : 'opt1'},
-                            {'label':'volkswagen passat', 'value' : 'opt2'},
-                            {'label':'ford super duty', 'value' : 'opt3'},
-                            {'label':'volkswagen up', 'value' : 'opt4'}
+                            {'label':'---', 'value' : 'opt1'},
+                            {'label':'Volkswagen Passat', 'value' : 'opt2'},
+                            {'label':'Ford Super Duty', 'value' : 'opt3'},
+                            {'label':'Volkswagen Up', 'value' : 'opt4'}
                         ],
                         value='opt1'
                     ),
-                    html.Label('powierzchnia czołowa:'),
+                    html.Label(u'powierzchnia czołowa [m²]'),
                     dcc.Slider(
                         id='v_slider1',
                         min=min_frontal_area,
@@ -317,7 +328,7 @@ app.layout = dbc.Container(
                         marks={min_frontal_area : str(min_frontal_area), max_frontal_area : str(max_frontal_area)},
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('współczynnik oporu toczenia:'),
+                    html.Label('współczynnik oporu toczenia'),
                     dcc.Slider(
                         id='v_slider2',
                         min=min_rolling_res_coef,
@@ -327,7 +338,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('współczynnik oporu aerodynamicznego:'),
+                    html.Label('współczynnik oporu aerodynamicznego'),
                     dcc.Slider(
                         id='v_slider3',
                         min=min_wind_res_coef,
@@ -337,7 +348,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('masa pojazdu:'),
+                    html.Label('masa pojazdu [kg]'),
                     dcc.Slider(
                         id='v_slider4',
                         min=min_vehicle_mass,
@@ -347,7 +358,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('promień koła:'),
+                    html.Label('promień koła [m]'),
                     dcc.Slider(
                         id='v_slider5',
                         min=min_wheel_radius,
@@ -357,7 +368,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('maksymalny moment siły silnika:'),
+                    html.Label('maksymalny moment siły silnika [Nm]'),
                     dcc.Slider(
                         id='v_slider6',
                         min=min_max_torque,
@@ -367,11 +378,20 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.H5("parametry środowiska"),
-                    dbc.Row(
-                    html.Button('resetuj parametry środowiska', id='e_param-button', n_clicks=0)
+                    html.Label(' '),
+                    html.H5(u'parametry środowiska'),
+                    html.Label('kształt trasy:'),
+                    dcc.Dropdown(
+                        id='route_menu',
+                        options=
+                        [
+                            {'label':'arcus tangens', 'value' : 'opt1'},
+                            {'label':'sinus', 'value' : 'opt2'},
+                            {'label':'sinus harmoniczny', 'value' : 'opt3'},
+                        ],
+                        value='opt1'
                     ),
-                    html.Label('gęstość powietrza:'),
+                    html.Label(u'gęstość powietrza [kg/m³]'),
                     dcc.Slider(
                         id='e_slider1',
                         min=min_air_density,
@@ -381,7 +401,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('przyspieszenie grawitacyjne:'),
+                    html.Label(u'przyspieszenie grawitacyjne [m/s²]'),
                     dcc.Slider(
                         id='e_slider2',
                         min=min_g,
@@ -391,7 +411,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('prędkość wiatru:'),
+                    html.Label('prędkość wiatru [m/s]'),
                     dcc.Slider( 
                         id='e_slider3',
                         min=min_wind_speed,
@@ -401,7 +421,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('kąt wiania wiatru:'),
+                    html.Label('kąt wiania wiatru [°]'),
                     dcc.Slider(
                         id='e_slider4',
                         min=min_wind_angle,
@@ -410,12 +430,16 @@ app.layout = dbc.Container(
                         value=wind_angle,
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
-                    ),
+                    )
+                    ], style={'width': '100%', 'margin': 10}),
+                ],
+                width=2
+            ),
+            dbc.Col(
+                [
+                    html.Div([
                     html.H5("parametry symulacji"),
-                    dbc.Row(
-                        html.Button('resetuj parametry symulacji', id='s_param-button', n_clicks=0)
-                    ),
-                    html.Label('prędkość początkowa:'),
+                    html.Label('prędkość początkowa [m/s]'),
                     dcc.Slider(
                         id='s_slider3',
                         min=min_start_vel,
@@ -425,7 +449,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('prędkość zadana:'),
+                    html.Label('prędkość zadana [m/s]'),
                     dcc.Slider(
                         id='s_slider4',
                         min=min_set_vel,
@@ -435,7 +459,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('położenie początkowe:'),
+                    html.Label('położenie początkowe [m]'),
                     dcc.Slider(
                         id='s_slider5',
                         min=min_start_pos,
@@ -445,7 +469,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('czas symulacji:'),
+                    html.Label('czas symulacji [s]'),
                     dcc.Slider(
                         id='s_slider1',
                         min=min_t,
@@ -455,17 +479,16 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('krok symulacji:'),
+                    html.Label('krok symulacji [s]'),
                     dcc.Slider(
                         id='s_slider2',
                         min=min_ts,
                         max=max_ts,
-                        step=1,
+                        step=None,
                         value=ts,
-                        marks=None,
-                        tooltip={"placement" : "bottom", "always_visible" : True}
+                        marks={ 0.1: '0.1', 1: '1', 10: '10'}
                     ),
-                    html.Label('k_p:'),
+                    html.Label('k_p'),
                     dcc.Slider(
                         id='s_slider6',
                         min=min_kp,
@@ -475,7 +498,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('T_i:'),
+                    html.Label('T_i'),
                     dcc.Slider(
                         id='s_slider7',
                         min=min_ti,
@@ -485,7 +508,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('T_d:'),
+                    html.Label(u'T_d'),
                     dcc.Slider(
                         id='s_slider8',
                         min=min_td,
@@ -495,23 +518,36 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
+                    html.H1(" "),
+                    dbc.Row(
+                    html.Button('resetuj parametry środowiska', id='e_param-button', n_clicks=0)
+                    ),
+                    dbc.Row(
+                        html.Button('resetuj parametry symulacji', id='s_param-button', n_clicks=0)
+                    ),
                     dbc.Row([
                         html.Button('dodaj ślad', id='add-button', n_clicks=0),
-                        html.Button('wyczyść wykresy', id='clr-button', n_clicks=0)
+                        html.Button('usuń poprzednie ślady', id='clr-button', n_clicks=0)
                     ]),
                     ], style={'width': '100%', 'margin': 10}),
                 ],
+                width=2
+            ),
+            dbc.Col(
+                html.Div([
+                dcc.Graph(id='graph-1', figure={'data': [], 'layout': layout1}),
+                dcc.Graph(id='graph-4', figure={'data': [], 'layout': layout4})
+                ], style={'width': '100%', 'margin': 10}),
                 width=4
             ),
             dbc.Col(
                 html.Div([
-                dcc.Graph(id='graph-1', figure={'data': [], 'layout': go.Layout(title='y = ax')}),
-                dcc.Graph(id='graph-2', figure={'data': [], 'layout': go.Layout(title='y = a*-x')}),
-                dcc.Graph(id='graph-3', figure={'data': [], 'layout': go.Layout(title='y = x*x + a')}),
+                dcc.Graph(id='graph-2', figure={'data': [], 'layout': layout2}),
+                dcc.Graph(id='graph-3', figure={'data': [], 'layout': layout3})
                 ], style={'width': '100%', 'margin': 10}),
-                width=8
+                width=4
             )
-        ], style={'width': '100%', 'margin': 10})
+        ], style={"margin-left": "0px"})
     ]
 )
 
@@ -520,12 +556,25 @@ app.layout = dbc.Container(
         Output('graph-1', 'figure'),
         Output('graph-2', 'figure'),
         Output('graph-3', 'figure'),
+        Output('graph-4', 'figure'),
         Output('v_slider1', 'value'),
         Output('v_slider2', 'value'),
         Output('v_slider3', 'value'),
         Output('v_slider4', 'value'),
         Output('v_slider5', 'value'),
         Output('v_slider6', 'value'),
+        Output('e_slider1', 'value'),
+        Output('e_slider2', 'value'),
+        Output('e_slider3', 'value'),
+        Output('e_slider4', 'value'),
+        Output('s_slider1', 'value'),
+        Output('s_slider2', 'value'),
+        Output('s_slider3', 'value'),
+        Output('s_slider4', 'value'),
+        Output('s_slider5', 'value'),
+        Output('s_slider6', 'value'),
+        Output('s_slider7', 'value'),
+        Output('s_slider8', 'value'),
         Output('v_slider1', 'disabled'),
         Output('v_slider2', 'disabled'),
         Output('v_slider3', 'disabled'),
@@ -535,8 +584,11 @@ app.layout = dbc.Container(
      ],
     [
         Input('dropdown_menu', 'value'),
+        Input('route_menu', 'value'),
         Input('add-button', 'n_clicks'),
         Input('clr-button', 'n_clicks'),
+        Input('e_param-button', 'n_clicks'),
+        Input('s_param-button', 'n_clicks'),
         Input('v_slider1', 'value'),
         Input('v_slider2', 'value'),
         Input('v_slider3', 'value'),
@@ -557,18 +609,44 @@ app.layout = dbc.Container(
         Input('s_slider8', 'value')
      ]
 )
-def update_graph(dropdown, add_n_clicks, clr_n_clicks, v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
-    global last_clr_n_clicks, last_add_n_clicks, traces
+def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_clicks, s_param_clicks,
+                 v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
+    global last_clr_n_clicks, last_add_n_clicks, last_s_param_clicks, last_e_param_clicks, traces, start
+
+    if route_dropdown == 'opt1':
+        route = route_arc_tan
+    elif route_dropdown == 'opt2':
+        route = route_sin
+    elif route_dropdown == 'opt3':
+        route = route_sin_harmonic
 
     if add_n_clicks != last_add_n_clicks:
-        add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
+        add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
         last_add_n_clicks = add_n_clicks
     else:
-        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
+        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
 
     if clr_n_clicks != last_clr_n_clicks:
-        traces = [[], [], []]
+        traces = [[], [], [], []]
         last_clr_n_clicks = clr_n_clicks
+
+    if e_param_clicks != last_e_param_clicks: 
+        e1 = default_air_density
+        e2 = default_g
+        e3 = default_wind_speed
+        e4 = default_wind_angle
+        last_e_param_clicks = e_param_clicks
+
+    if s_param_clicks != last_s_param_clicks:
+        s1 = default_t
+        s2 = default_ts
+        s3 = default_set_vel
+        s4 = default_start_vel
+        s5 = default_start_pos
+        s6 = default_kp
+        s7 = default_ti
+        s8 = default_td
+        last_s_param_clicks = s_param_clicks
 
     if dropdown == 'opt1':
         disabled = False
@@ -595,15 +673,16 @@ def update_graph(dropdown, add_n_clicks, clr_n_clicks, v1, v2, v3, v4, v5, v6, e
             v4 = model_3_vehicle_mass
             v5 = model_3_wheel_radius
             v6 = model_3_max_torque
-        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8)
+        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     
     figures = [
-        {'data': traces[0], 'layout': go.Layout(title='prędkość')},
-        {'data': traces[1], 'layout': go.Layout(title='siła')},
-        {'data': traces[2], 'layout': go.Layout(title='nachylenie')},
+        {'data': traces[0], 'layout': layout1},
+        {'data': traces[1], 'layout': layout2},
+        {'data': traces[2], 'layout': layout3},
+        {'data': traces[3], 'layout': layout4}
     ]
     
-    return figures[0], figures[1], figures[2], v1, v2, v3, v4, v5, v6, disabled, disabled, disabled, disabled, disabled, disabled
+    return figures[0], figures[1], figures[2], figures[3], v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, disabled, disabled, disabled, disabled, disabled, disabled
 
 if __name__ == '__main__':
     app.run_server(debug=True)
