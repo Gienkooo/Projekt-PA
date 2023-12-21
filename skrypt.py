@@ -56,6 +56,9 @@ def route_sin(x):
 def route_sin_harmonic(x):
     return ((math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420)) * 5)
 
+def route_const(x):
+    return 0
+
 #passat vlkswagen
 model_1_frontal_area = 2.1
 model_1_wind_res_coef = 0.29
@@ -300,7 +303,7 @@ def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5
 app.layout = dbc.Container(
     fluid=True,
     children=[
-        html.H1("TEMPOMAT"),
+        html.H1(" TEMPOMAT"),
         dbc.Row([
             dbc.Col(
                 [
@@ -388,6 +391,7 @@ app.layout = dbc.Container(
                             {'label':'arcus tangens', 'value' : 'opt1'},
                             {'label':'sinus', 'value' : 'opt2'},
                             {'label':'sinus harmoniczny', 'value' : 'opt3'},
+                            {'label':'stała', 'value' : 'opt4'}
                         ],
                         value='opt1'
                     ),
@@ -619,6 +623,8 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
         route = route_sin
     elif route_dropdown == 'opt3':
         route = route_sin_harmonic
+    elif route_dropdown == 'opt4':
+        route = route_const
 
     if add_n_clicks != last_add_n_clicks:
         add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
@@ -685,4 +691,4 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
     return figures[0], figures[1], figures[2], figures[3], v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, disabled, disabled, disabled, disabled, disabled, disabled
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
