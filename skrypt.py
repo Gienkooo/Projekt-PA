@@ -321,7 +321,7 @@ app.layout = dbc.Container(
                         id='dropdown_menu',
                         options=
                         [
-                            {'label':'---', 'value' : 'opt1'},
+                            {'label':'niestandardowy', 'value' : 'opt1'},
                             {'label':'Volkswagen Passat', 'value' : 'opt2'},
                             {'label':'Ford Super Duty', 'value' : 'opt3'},
                             {'label':'Volkswagen Up', 'value' : 'opt4'}
