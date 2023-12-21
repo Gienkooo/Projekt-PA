@@ -10,13 +10,13 @@ def e(v, sv):
     return v - sv
 
 def perpendicular_component(v, alfa):
-    return math.cos(alfa) * v
+    return math.cos(math.radians(alfa)) * v
 
 def parallel_component(v, alfa):
-    return math.sin(alfa) * v
+    return math.sin(math.radians(alfa)) * v
 
 def slope(func, x, dx):
-    return (func(x) - func(x - dx)) / dx
+    return math.atan((func(x) - func(x - dx)) / dx)
 
 def acceleration(F, m):
     return F / m
@@ -46,7 +46,7 @@ def air_drag(v):
     return 0.5 * wind_res_coef * frontal_area * air_density * v * v
 
 def wind_force(v, wind_v):
-    return air_drag(v + wind_v)
+    return air_drag(v - perpendicular_component(wind_v, wind_angle))
 
 
 air_density = 1.293
@@ -89,9 +89,9 @@ for _ in range(int(t / ts)):
     e_arr.append(set_vel - vel_arr[-1])
     es_arr.append(es_arr[-1] + e_arr[-1])
     curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
-    slope_arr.append(curr_slope)
+    slope_arr.append(curr_slope) # dodać parametry kp itd oraz zmienić je na czas zdwojenia
     F_motor = max(-max_force, min(max_force, (kp * e_arr[-1] + ki * es_arr[-1] + kd * (e_arr[-2] - e_arr[-1]) / ts) * vehicle_mass / ts))
-    F_rolling = rolling_resistance(curr_slope)
+    F_rolling = rolling_resistance(curr_slope) # jaka jest wartość czasu zdwojenia
     F_drag = air_drag(vel_arr[-1])
     F_wind = wind_force(vel_arr[-1], perpendicular_component(wind_speed, math.radians(wind_angle)))
     F_rolldown = rolldown(curr_slope)
