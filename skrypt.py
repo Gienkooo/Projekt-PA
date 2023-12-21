@@ -160,7 +160,7 @@ min_start_vel = 0
 min_start_pos = -1000
 min_kp = 0.1
 min_ti = 0.1
-min_td = 0.01
+min_td = 0.00
 
 max_t = 500
 max_ts = 10
@@ -169,7 +169,7 @@ max_start_vel = 50
 max_start_pos = 0
 max_kp = 10
 max_ti = 100
-max_td = 0.25
+max_td = 10
 max_force = generated_force(max_torque)
 
 time_array = [0]
@@ -179,6 +179,7 @@ h_arr = [route_func(pos_arr[-1])]
 e_arr = [0]
 es_arr = [0]
 a_arr = [0]
+a_obj_arr = [0]
 F_arr = [0]
 slope_arr = [slope(route_func, pos_arr[-1], 1)]
 rolldown_arr = [rolldown(slope_arr[-1])]
@@ -225,7 +226,7 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
 
 def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, F_arr, slope_arr, rolldown_arr, route_func
+    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, slope_arr, rolldown_arr, route_func, max_set_vel
     time_array = [0]
     vel_arr = [start_vel]
     pos_arr = [start_pos]
@@ -233,6 +234,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
     e_arr = [0]
     es_arr = [0]
     a_arr = [0]
+    a_obj_arr = [0]
     F_arr = [0]
     slope_arr = [slope(route_func, pos_arr[-1], 1)]
     rolldown_arr = [rolldown(slope_arr[-1])]
@@ -241,7 +243,8 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
         es_arr.append(es_arr[-1] + e_arr[-1])
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
-        F_motor = max(-max_force, min(max_force, kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) * vehicle_mass / ts))
+        #F_motor = max(-max_force, min(max_force, kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) * vehicle_mass / ts))
+        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) / (max_set_vel)))
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
         F_wind = wind_force(vel_arr[-1], perpendicular_component(wind_speed, math.radians(wind_angle)))
@@ -252,6 +255,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
         curr_pos = pos_arr[-1] + curr_vel * ts
         time_array.append(ts + time_array[-1])
         vel_arr.append(curr_vel)
+        a_obj_arr.append(vel_arr[-1] - vel_arr[-2])
         pos_arr.append(curr_pos)
         h_arr.append(route_func(curr_pos))
         a_arr.append(a)
@@ -304,7 +308,7 @@ def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5
     if traces[0] and traces[1] and traces[2]:
         traces[0][-1]['y'] = h_arr
         traces[1][-1]['y'] = vel_arr
-        traces[2][-1]['y'] = a_arr
+        traces[2][-1]['y'] = a_obj_arr
         traces[3][-1]['y'] = e_arr
 
 app.layout = dbc.Container(

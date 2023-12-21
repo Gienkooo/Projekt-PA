@@ -27,7 +27,7 @@
 				Symbol & Jednostka & Opis \\
 				\hline
 				\hline
-				$func(x)$ & 1 & Funkcja trasy \\
+				$func(x)$ & - & Funkcja trasy \\
 				\hline
 				$\rho$ & $\frac{kg}{m^3}$ & Gęstość powietrza \\
 				\hline
@@ -49,9 +49,9 @@
 			\hline
 			$A$ & $m^2$ & Powierzchnia czołowa \\
 			\hline
-			$\mu$ & 1 & Współczynnik oporu toczenia \\
+			$\mu$ & - & Współczynnik oporu toczenia \\
 			\hline
-			$C_d$ & 1 & Współczynnik oporu aerodynamicznego \\
+			$C_d$ & - & Współczynnik oporu aerodynamicznego \\
 			\hline
 			$m$ & $kg$ & Masa pojazdu \\
 			\hline
@@ -127,9 +127,9 @@
 		\[
 			F_a = \frac{1}{2} C_d A \rho (v - v_wcos(\alpha_w\frac{\pi}{180°}))^2
 		\]
-		\item Siła silnika
+		\item Siła ciągu silnika
 		\[
-			F_m = max\left(-\frac{M_l}{r} ,min\left(\frac{M_l}{r}, \frac{mkp\left(e(t_e) + \frac{1}{T_i}\int_{-\infty}^{t_s}e(t_i)dt_i + T_d(e(t_e) - e(t_e - t_s))\right)}{t_s}\right)\right)
+			F_m = max\left(-\frac{M_l}{r} ,min\left(\frac{M_l}{r}, \frac{mk_p\left(e(t_e) + \frac{1}{T_i}\int_{-\infty}^{t_s}e(t_i)dt_i + T_d(e(t_e) - e(t_e - t_s))\right)}{t_s}\right)\right)
 		\]
 		Więcej na temat regulatora w następnej sekcji.
 	\end{enumerate}
