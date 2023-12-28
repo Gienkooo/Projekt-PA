@@ -231,7 +231,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
     vel_arr = [start_vel]
     pos_arr = [start_pos]
     h_arr = [route_func(pos_arr[-1])]
-    e_arr = [0]
+    e_arr = [set_vel - start_vel]
     es_arr = [0]
     a_arr = [0]
     a_obj_arr = [0]
@@ -244,7 +244,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
         es_arr.append(es_arr[-1] + e_arr[-1])
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
-        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) / (max_set_vel)))
+        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (max_set_vel)))
         F_motor_arr.append(F_motor)
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
