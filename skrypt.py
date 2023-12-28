@@ -180,6 +180,7 @@ es_arr = [0]
 a_arr = [0]
 a_obj_arr = [0]
 F_arr = [0]
+F_motor_arr = [0]
 slope_arr = [slope(route_func, pos_arr[-1], 1)]
 rolldown_arr = [rolldown(slope_arr[-1])]
 
@@ -225,7 +226,7 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
 
 def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, slope_arr, rolldown_arr, route_func, max_set_vel
+    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, F_motor_arr, slope_arr, rolldown_arr, route_func, max_set_vel
     time_array = [0]
     vel_arr = [start_vel]
     pos_arr = [start_pos]
@@ -235,6 +236,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
     a_arr = [0]
     a_obj_arr = [0]
     F_arr = [0]
+    F_motor_arr = [0]
     slope_arr = [slope(route_func, pos_arr[-1], 1)]
     rolldown_arr = [rolldown(slope_arr[-1])]
     for _ in range(int(t / ts)):
@@ -243,6 +245,7 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
         F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) / (max_set_vel)))
+        F_motor_arr.append(F_motor)
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
         F_wind = wind_force(vel_arr[-1], perpendicular_component(wind_speed, math.radians(wind_angle)))
@@ -288,7 +291,7 @@ def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6
     )
     new_trace3 = go.Scatter(
         x=[i for i in range(max_t + 1)],
-        y=a_arr,
+        y=F_motor_arr,
         mode='lines',
     )
     new_trace4 = go.Scatter(
