@@ -129,7 +129,7 @@
 		\]
 		\item Siła ciągu silnika
 		\[
-			F_m = max\left(-\frac{M_l}{r}, min\left(\frac{M_l}{r}, \frac{M_l}{r} * \frac{k_p * \left(e(n) + \frac{1}{T_i} \sum_{i = 0}^{n - 1} e(i) + T_d \frac{e(n) - e(n - 1)}{t_s} \right)}{v_s}\right)\right)
+			F_m = max\left(-\frac{M_l}{r}, min\left(\frac{M_l}{r}, \frac{M_l}{r} * \frac{k_p \cdot \left(e(t_e) + \frac{1}{T_i} \sum_{i = 0}^{n - 1} e(i \cdot t_s) + T_d \frac{e(t_e) - e(t_e - t_s)}{t_s} \right)}{v_s}\right)\right)
 		\]
 		Więcej na temat regulatora w następnej sekcji.
 	\end{enumerate}
