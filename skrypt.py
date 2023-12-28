@@ -1,5 +1,4 @@
 import math
-import numpy as np
 import plotly.graph_objects as go
 import dash 
 from dash import html, dcc, Input, Output
@@ -48,13 +47,13 @@ def wind_force(v, wind_v):
     return air_drag(v - perpendicular_component(wind_v, wind_angle))
 
 def route_arc_tan(x):
-    return math.atan(x / 400) * 10
+    return (math.atan(x / 400) + math.pi / 2) * 10
 
 def route_sin(x):
-    return math.sin(x / 400) * 5
+    return (math.sin(x / 400) + 1) * 5
 
 def route_sin_harmonic(x):
-    return ((math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420)) * 5)
+    return (math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420) + 3) * 5
 
 def route_const(x):
     return 0
@@ -181,6 +180,7 @@ es_arr = [0]
 a_arr = [0]
 a_obj_arr = [0]
 F_arr = [0]
+F_motor_arr = [0]
 slope_arr = [slope(route_func, pos_arr[-1], 1)]
 rolldown_arr = [rolldown(slope_arr[-1])]
 
@@ -226,16 +226,17 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
 
 def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, slope_arr, rolldown_arr, route_func, max_set_vel
+    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, F_motor_arr, slope_arr, rolldown_arr, route_func, max_set_vel
     time_array = [0]
     vel_arr = [start_vel]
     pos_arr = [start_pos]
     h_arr = [route_func(pos_arr[-1])]
-    e_arr = [0]
+    e_arr = [set_vel - start_vel]
     es_arr = [0]
     a_arr = [0]
     a_obj_arr = [0]
     F_arr = [0]
+    F_motor_arr = [0]
     slope_arr = [slope(route_func, pos_arr[-1], 1)]
     rolldown_arr = [rolldown(slope_arr[-1])]
     for _ in range(int(t / ts)):
@@ -243,8 +244,8 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
         es_arr.append(es_arr[-1] + e_arr[-1])
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
-        #F_motor = max(-max_force, min(max_force, kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) * vehicle_mass / ts))
-        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-2] - e_arr[-1]) / ts) / (max_set_vel)))
+        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (max_set_vel)))
+        F_motor_arr.append(F_motor)
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
         F_wind = wind_force(vel_arr[-1], perpendicular_component(wind_speed, math.radians(wind_angle)))
@@ -271,10 +272,10 @@ last_s_param_clicks = 0
 last_e_param_clicks = 0
 start = True
 
-layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]'),xaxis=dict(title='t [s]'))
-layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]'),xaxis=dict(title='t [s]'))
-layout3 = go.Layout(title='przyspieszenie pojazdu a(t)',yaxis=dict(title=u'a [m/s²]'),xaxis=dict(title='t [s]'))
-layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]'),xaxis=dict(title='t [s]'))
+layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout3 = go.Layout(title='siła ciągu silnika F(t)',yaxis=dict(title=u'F [kg · m/s²]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 
 def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
@@ -290,7 +291,7 @@ def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6
     )
     new_trace3 = go.Scatter(
         x=[i for i in range(max_t + 1)],
-        y=a_arr,
+        y=F_motor_arr,
         mode='lines',
     )
     new_trace4 = go.Scatter(
@@ -308,7 +309,7 @@ def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5
     if traces[0] and traces[1] and traces[2]:
         traces[0][-1]['y'] = h_arr
         traces[1][-1]['y'] = vel_arr
-        traces[2][-1]['y'] = a_obj_arr
+        traces[2][-1]['y'] = F_motor_arr
         traces[3][-1]['y'] = e_arr
 
 app.layout = dbc.Container(
