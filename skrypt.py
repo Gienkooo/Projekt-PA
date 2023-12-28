@@ -1,5 +1,4 @@
 import math
-import numpy as np
 import plotly.graph_objects as go
 import dash 
 from dash import html, dcc, Input, Output
@@ -48,13 +47,13 @@ def wind_force(v, wind_v):
     return air_drag(v - perpendicular_component(wind_v, wind_angle))
 
 def route_arc_tan(x):
-    return math.atan(x / 400) * 10
+    return (math.atan(x / 400) + math.pi / 2) * 10
 
 def route_sin(x):
-    return math.sin(x / 400) * 5
+    return (math.sin(x / 400) + 1) * 5
 
 def route_sin_harmonic(x):
-    return ((math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420)) * 5)
+    return (math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420) + 3) * 5
 
 def route_const(x):
     return 0
@@ -271,10 +270,10 @@ last_s_param_clicks = 0
 last_e_param_clicks = 0
 start = True
 
-layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]'),xaxis=dict(title='t [s]'))
-layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]'),xaxis=dict(title='t [s]'))
-layout3 = go.Layout(title='przyspieszenie pojazdu a(t)',yaxis=dict(title=u'a [m/s²]'),xaxis=dict(title='t [s]'))
-layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]'),xaxis=dict(title='t [s]'))
+layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout3 = go.Layout(title='przyspieszenie pojazdu a(t)',yaxis=dict(title=u'a [m/s²]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 
 def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
