@@ -23,13 +23,13 @@ def pressure(m):
     return m * g
 
 def generated_force(torque):
-    return torque / wheel_radius
+    return torque #/ wheel_radius
 
 def generated_torque(F):
-    return F * wheel_radius
+    return F #* wheel_radius
 
 def generated_force_capped(torque):
-    return max(-max_torque, min(max_torque, torque)) / wheel_radius
+    return max(-max_torque, min(max_torque, torque)) #/ wheel_radius
 
 def perpendicular_pressure(alfa):
     return perpendicular_component(pressure(vehicle_mass), alfa)
@@ -74,7 +74,6 @@ model_2_frontal_area = 2.8
 model_2_wind_res_coef = 0.33
 model_2_rolling_res_coef = 0.007
 model_2_vehicle_mass = 2600
-model_2_wheel_radius = 0.38
 model_2_max_torque = 1600.0
 model_2_kp = 2
 model_2_ti = 14.4
@@ -86,7 +85,6 @@ model_3_frontal_area = 1.7
 model_3_wind_res_coef = 0.32
 model_3_rolling_res_coef = 0.004
 model_3_vehicle_mass = 1080
-model_3_wheel_radius = 0.30
 model_3_max_torque = 230.0
 
 #vehicle parameters
@@ -94,21 +92,18 @@ frontal_area = 1.89
 wind_res_coef = 0.36
 rolling_res_coef = 0.012
 vehicle_mass = 2000
-wheel_radius = 0.2159
 max_torque = 200
 
 min_frontal_area = 1.0
 min_wind_res_coef = 0.0
 min_rolling_res_coef = 0.0
 min_vehicle_mass = 1000.0
-min_wheel_radius = 0.1
 min_max_torque = 0.0
 
 max_frontal_area = 3.0
 max_wind_res_coef = 1.0
 max_rolling_res_coef = 1.0
 max_vehicle_mass = 5000.0
-max_wheel_radius = 1.0
 max_max_torque = 2500.0
 
 #enviorment parameters
@@ -184,31 +179,13 @@ F_motor_arr = [0]
 slope_arr = [slope(route_func, pos_arr[-1], 1)]
 rolldown_arr = [rolldown(slope_arr[-1])]
 
-def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
-    global frontal_area
-    global wind_res_coef
-    global rolling_res_coef
-    global vehicle_mass 
-    global wheel_radius 
-    global max_torque
-    global max_force 
-    global air_density 
-    global g
-    global wind_speed 
-    global wind_angle
-    global t
-    global ts
-    global set_vel
-    global route_func
-    global start_vel
-    global start_pos
-    global kp, ti, td
+def set_global_variables(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    global frontal_area, wind_res_coef, rolling_res_coef, vehicle_mass , max_torque, max_force , air_density , g, wind_speed , wind_angle, t, ts, set_vel, route_func, start_vel, start_pos, kp, ti, td
     frontal_area = v1
     wind_res_coef = v2
     rolling_res_coef = v3
     vehicle_mass = v4
-    wheel_radius = v5
-    max_torque = v6
+    max_torque = v5
     max_force = generated_force(max_torque)
     route_func = route
     air_density = e1
@@ -224,8 +201,8 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
     ti = s7
     td = s8
 
-def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
-    set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+def compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    set_global_variables(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, F_motor_arr, slope_arr, rolldown_arr, route_func, max_set_vel, max_force, vehicle_mass, rolling_res_coef, wind_res_coef, frontal_area, air_density
     time_array = [0]
     vel_arr = [start_vel]
@@ -278,8 +255,8 @@ layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]',
 layout3 = go.Layout(title='siła ciągu silnika F(t)',yaxis=dict(title=u'F [kg · m/s²]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 
-def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
-    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+def add_new_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     x = [i for i in range(0, max_t + 1, s2)]
     new_trace1 = go.Scatter(
         x=x,
@@ -306,8 +283,8 @@ def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6
     traces[2].append(new_trace3)
     traces[3].append(new_trace4)
 
-def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
-    compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+def modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
+    compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     x = [i for i in range(0, max_t + 1, s2)]
     if traces[0] and traces[1] and traces[2] and traces[3]:
         traces[0][-1]['y'] = h_arr
@@ -380,19 +357,9 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('promień koła [m]'),
+                    html.Label('maksymalna siła ciągu silnika [N]'),
                     dcc.Slider(
                         id='v_slider5',
-                        min=min_wheel_radius,
-                        max=max_wheel_radius,
-                        step=0.01,
-                        value=wheel_radius,
-                        marks=None,
-                        tooltip={"placement" : "bottom", "always_visible" : True}
-                    ),
-                    html.Label('maksymalny moment siły silnika [Nm]'),
-                    dcc.Slider(
-                        id='v_slider6',
                         min=min_max_torque,
                         max=max_max_torque,
                         step=0.01,
@@ -585,7 +552,6 @@ app.layout = dbc.Container(
         Output('v_slider3', 'value'),
         Output('v_slider4', 'value'),
         Output('v_slider5', 'value'),
-        Output('v_slider6', 'value'),
         Output('e_slider1', 'value'),
         Output('e_slider2', 'value'),
         Output('e_slider3', 'value'),
@@ -602,8 +568,7 @@ app.layout = dbc.Container(
         Output('v_slider2', 'disabled'),
         Output('v_slider3', 'disabled'),
         Output('v_slider4', 'disabled'),
-        Output('v_slider5', 'disabled'),
-        Output('v_slider6', 'disabled'),
+        Output('v_slider5', 'disabled')
      ],
     [
         Input('dropdown_menu', 'value'),
@@ -617,7 +582,6 @@ app.layout = dbc.Container(
         Input('v_slider3', 'value'),
         Input('v_slider4', 'value'),
         Input('v_slider5', 'value'),
-        Input('v_slider6', 'value'),
         Input('e_slider1', 'value'),
         Input('e_slider2', 'value'),
         Input('e_slider3', 'value'),
@@ -633,7 +597,7 @@ app.layout = dbc.Container(
      ]
 )
 def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_clicks, s_param_clicks,
-                 v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
+                 v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
     global last_clr_n_clicks, last_add_n_clicks, last_s_param_clicks, last_e_param_clicks, traces, start
 
     if route_dropdown == 'opt1':
@@ -646,10 +610,10 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
         route = route_const
 
     if add_n_clicks != last_add_n_clicks:
-        add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+        add_new_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
         last_add_n_clicks = add_n_clicks
     else:
-        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+        modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
 
     if clr_n_clicks != last_clr_n_clicks:
         traces = [[], [], [], []]
@@ -682,23 +646,20 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
             v2 = model_1_wind_res_coef
             v3 = model_1_rolling_res_coef
             v4 = model_1_vehicle_mass
-            v5 = model_1_wheel_radius
-            v6 = model_1_max_torque
+            v5 = model_1_max_torque
         elif dropdown == 'opt3':
             v1 = model_2_frontal_area
             v2 = model_2_wind_res_coef
             v3 = model_2_rolling_res_coef
             v4 = model_2_vehicle_mass
-            v5 = model_2_wheel_radius
-            v6 = model_2_max_torque
+            v5 = model_2_max_torque
         elif dropdown == 'opt4':
             v1 = model_3_frontal_area
             v2 = model_3_wind_res_coef
             v3 = model_3_rolling_res_coef
             v4 = model_3_vehicle_mass
-            v5 = model_3_wheel_radius
-            v6 = model_3_max_torque
-        modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+            v5 = model_3_max_torque
+        modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     
     figures = [
         {'data': traces[0], 'layout': layout1},
@@ -707,7 +668,7 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
         {'data': traces[3], 'layout': layout4}
     ]
     
-    return figures[0], figures[1], figures[2], figures[3], v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, disabled, disabled, disabled, disabled, disabled, disabled
+    return figures[0], figures[1], figures[2], figures[3], v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, disabled, disabled, disabled, disabled, disabled
 
 if __name__ == '__main__':
     app.run_server(debug=False)
