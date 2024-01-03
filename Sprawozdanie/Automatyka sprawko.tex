@@ -55,10 +55,9 @@
 			\hline
 			$m$ & $kg$ & Masa pojazdu \\
 			\hline
-			$r$ & $m$ & Promień koła \\
+			$F_{max}$ & $N$ & Maksymalna siła ciągu silnika \\
 			\hline
-			$M_l$ & $Nm$ & Maksymalny moment siły silnika \\
-			\hline
+			
 		\end{tabular}
 	\end{center}
 
@@ -129,7 +128,7 @@
 		\]
 		\item Siła ciągu silnika
 		\[
-			F_m = max\left(-\frac{M_l}{r}, min\left(\frac{M_l}{r}, \frac{M_l}{r} * \frac{k_p \cdot \left(e(t_e) + \frac{1}{T_i} \sum_{i = 0}^{n - 1} e(i \cdot t_s) + T_d \frac{e(t_e) - e(t_e - t_s)}{t_s} \right)}{v_s}\right)\right)
+			F_c = F_{max} \cdot \frac{k_p \cdot \left(e(t_e) + \frac{t_s}{T_i}\sum_{n}^{i=0}e(i \cdot t_s) + T_d \frac{e(t_e) - e(t_e - t_s)}{t_s}\right)}{v_{max}}
 		\]
 		Więcej na temat regulatora w następnej sekcji.
 	\end{enumerate}
@@ -144,5 +143,16 @@
 		\item \textbf{Całkujący (I)} \\ Składowa całkująca uwzględnia historię błędów w systemie poprzez sumowanie bieżących błędów w czasie. Dzięki temu, nawet jeśli błąd jest niewielki, ale występuje stale przez dłuższy czas, składowa całkująca stopniowo zwiększa korektę wyjścia regulatora. Składowa ta pomaga eliminować błąd ustalony (czyli różnicę między wartością zadaną a wartością rzeczywistą w stanie ustalonym), jednak może też prowadzić do nadmiernego wzmocnienia i oscylacji. \\
   		\item \textbf{Różniczkujący (D)} \\ Składowa różniczkująca przewiduje przyszłe zmiany poprzez obserwowanie szybkości zmian błędu w czasie. Jej zadaniem jest redukcja oscylacji poprzez hamowanie wzrostu korekty, gdy błąd zmienia się zbyt szybko. Pomaga to w szybszym reagowaniu na zbliżające się wartości zadaną oraz zmniejsza oscylacje wokół tej wartości. Składowa różniczkująca może jednak zwiększać szumy sygnału.\\
 	\end{itemize}
- 	Regulator PID wykorzystuje kombinację tych trzech składowych, które są mnożone przez odpowiednie współczynniki ($k_p$, $T_i$, $T_d$) i sumowane, aby wygenerować korektę sygnału sterującego. Optymalne dostrojenie (tuning) regulatora PID polega na dobraniu odpowiednich wartości tych współczynników, aby osiągnąć pożądaną stabilność, szybkość reakcji oraz eliminację błędów w systemie regulowanym. Tuning regulatora PID jest często iteracyjnym procesem, wymagającym eksperymentowania z różnymi wartościami współczynników dla danego systemu.
+ 	Regulator PID wykorzystuje kombinację tych trzech składowych, które są mnożone przez odpowiednie współczynniki ($k_p$, $T_i$, $T_d$) i sumowane, aby wygenerować korektę sygnału sterującego. Optymalne dostrojenie (tuning) regulatora PID polega na dobraniu odpowiednich wartości tych współczynników, aby osiągnąć pożądaną stabilność, szybkość reakcji oraz eliminację błędów w systemie regulowanym. Tuning regulatora PID jest często iteracyjnym procesem, wymagającym eksperymentowania z różnymi wartościami współczynników dla danego systemu. \\
+ 	W przedstawionej implementacji regulatora PID równanie zostało przeskalowane do przedziału wartości $[-1; 1]$, aby reprezentować procent maksymalnej dostępnej siły przyspieszania lub hamowania. Do tego celu wykorzystano stałą $v_{max}$, określającą maksymalną prędkość, jaką pojazd w danej konfiguracji może osiągnąć w warunkach idealnych (bez wpływu wiatru, na poziomej nawierzchni). Wartość $v_{max}$ została obliczona poprzez porównanie siły ciągu z sumą oporów toczenia i aerodynamicznego. Po podstawieniu maksymalnego ciągu oraz innych parametrów pojazdu otrzymuje się wartość maksymalnej prędkości $v_{max}$.
+ 	\[
+ 		F_{c} = F_{t} + F_{a}
+ 	\]	
+ 	\[
+ 		F_{c} = mg\mu + \frac{1}{2}C_{d}A\rho v^2
+ 	\]
+ 	\[
+ 		v_{max} = \sqrt{\frac{2F_{max} - 2mg\mu}{C_{d}A\rho}}
+ 	\]
+ 	
 \end{document}
