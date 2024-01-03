@@ -68,9 +68,9 @@ model_1_wind_res_coef = 0.29
 model_1_rolling_res_coef = 0.05
 model_1_vehicle_mass = 1450
 model_1_max_torque = 420
-model_1_kp = 2
-model_1_ti = 10
-model_1_td = 0.06
+#model_1_kp = 2
+#model_1_ti = 10
+#model_1_td = 0.06
 
 #ford super duty
 model_2_frontal_area = 2.8
@@ -260,7 +260,7 @@ layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tic
 
 def add_new_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    x = [i for i in range(0, max_t + 1, s2)]
+    x = [i * s2 for i in range(0, int(max_t + 1 / s2))]
     new_trace1 = go.Scatter(
         x=pos_arr,
         y=h_arr,
