@@ -156,7 +156,7 @@ min_set_vel = 0
 min_start_vel = 0
 min_start_pos = 0
 min_kp = 0.1
-min_ti = 0
+min_ti = 0.1
 min_td = 0
 
 max_t = 500
@@ -164,7 +164,7 @@ max_ts = 10
 max_set_vel = 50
 max_start_vel = 50
 max_start_pos = 1000
-max_kp = 10
+max_kp = 25
 max_ti = 250
 max_td = 10
 max_force = generated_force(max_torque)
@@ -253,7 +253,7 @@ last_s_param_clicks = 0
 last_e_param_clicks = 0
 start = True
 
-layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='x [m]', tickformat='.2f'))
+layout1 = go.Layout(title='kształt przebytej trasy h(x)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='x [m]', tickformat='.2f'))
 layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 layout3 = go.Layout(title='siła ciągu silnika F(t)',yaxis=dict(title=u'F [kg · m/s²]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
@@ -288,7 +288,7 @@ def add_new_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7
 
 def modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    x = [i for i in range(0, max_t + 1, s2)]
+    x = [i * s2 for i in range(0, int(max_t + 1 / s2))]
     if traces[0] and traces[1] and traces[2] and traces[3]:
         traces[0][-1]['y'] = h_arr
         traces[1][-1]['y'] = vel_arr
