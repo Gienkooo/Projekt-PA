@@ -89,7 +89,7 @@
 	\end{center}
 	
 	\subsection{Parametry dynamiczne}
-	Wartości niektórych parametrów podstawowych są wsprost zależne od aktualnego stanu symulacji. Ich wartości obliczane są podczas każdej iteracji.
+	Wartości niektórych parametrów podstawowych są wprost zależne od aktualnego stanu symulacji. Ich wartości obliczane są podczas każdej iteracji.
 	
 	\begin{itemize}
 		\item Nachylenie zbocza - $\alpha$ \\
@@ -129,7 +129,7 @@
 		\]
 		\item Siła ciągu silnika
 		\[
-			F_m = max\left(-\frac{M_l}{r} ,min\left(\frac{M_l}{r}, \frac{mk_p\left(e(t_e) + \frac{1}{T_i}\int_{-\infty}^{t_s}e(t_i)dt_i + T_d(e(t_e) - e(t_e - t_s))\right)}{t_s}\right)\right)
+			F_m = max\left(-\frac{M_l}{r}, min\left(\frac{M_l}{r}, \frac{M_l}{r} * \frac{k_p \cdot \left(e(t_e) + \frac{1}{T_i} \sum_{i = 0}^{n - 1} e(i \cdot t_s) + T_d \frac{e(t_e) - e(t_e - t_s)}{t_s} \right)}{v_s}\right)\right)
 		\]
 		Więcej na temat regulatora w następnej sekcji.
 	\end{enumerate}
