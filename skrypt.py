@@ -139,9 +139,9 @@ default_ts = 1
 default_set_vel = 10
 default_start_vel = 0
 default_start_pos = -1000
-default_kp = 0.1
-default_ti = 35
-default_td = 0.05
+default_kp = 2
+default_ti = 70
+default_td = 0.5
 
 t = 250 #s
 ts = 1 #s
@@ -167,7 +167,7 @@ max_set_vel = 50
 max_start_vel = 50
 max_start_pos = 0
 max_kp = 10
-max_ti = 100
+max_ti = 250
 max_td = 10
 max_force = generated_force(max_torque)
 
@@ -239,13 +239,13 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
     F_motor_arr = [0]
     slope_arr = [slope(route_func, pos_arr[-1], 1)]
     rolldown_arr = [rolldown(slope_arr[-1])]
-    v_max = math.sqrt(max(2 * max_force - 2 * vehicle_mass * g * rolling_res_coef / wind_res_coef * frontal_area * air_density, 0.0000001))
+    v_max = math.sqrt(max((2 * max_force - 2 * vehicle_mass * g * rolling_res_coef) / (wind_res_coef * frontal_area * air_density), 0.0000001))
     for _ in range(int(t / ts)):
         e_arr.append(set_vel - vel_arr[-1])
         es_arr.append(es_arr[-1] + e_arr[-1])
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
-        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (v_max)))
+        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (ts / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (v_max)))
         F_motor_arr.append(F_motor)
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
