@@ -41,7 +41,7 @@ def rolling_resistance(F):
     return F * rolling_res_coef
 
 def air_drag(v):
-    print(f"wrc: {wind_res_coef} | fa: {frontal_area} | v: {v} | airdrag: {0.5 * wind_res_coef * frontal_area * air_density * v * v}")
+    #print(f"wrc: {wind_res_coef} | fa: {frontal_area} | v: {v} | airdrag: {0.5 * wind_res_coef * frontal_area * air_density * v * v}")
     return 0.5 * wind_res_coef * frontal_area * air_density * v * v
 
 def wind_force(v, wind_v):
@@ -67,28 +67,30 @@ model_1_frontal_area = 2.1
 model_1_wind_res_coef = 0.25
 model_1_rolling_res_coef = 0.01
 model_1_vehicle_mass = 1450
-model_1_max_torque = 420
-#model_1_kp = 2
-#model_1_ti = 10
-#model_1_td = 0.06
+model_1_max_torque = 833.0
+model_1_kp = 12.5
+model_1_ti = 380.0
+model_1_td = 5.0
 
 #ford super duty
 model_2_frontal_area = 2.8
 model_2_wind_res_coef = 0.4
 model_2_rolling_res_coef = 0.02
 model_2_vehicle_mass = 2600
-model_2_max_torque = 1600.0
-#model_2_kp = 2
-#model_2_ti = 14.4
-#model_2_td = 0.05
-
+model_2_max_torque = 2500.0
+model_2_kp = 17
+model_2_ti = 215.0
+model_2_td = 2.0
 
 #volkswagen up
 model_3_frontal_area = 1.7
 model_3_wind_res_coef = 0.32
 model_3_rolling_res_coef = 0.01
 model_3_vehicle_mass = 1080
-model_3_max_torque = 230.0
+model_3_max_torque = 403.0
+model_3_kp = 20.7
+model_3_ti = 500.0
+model_3_td = 2.18
 
 #vehicle parameters
 frontal_area = 1.89
@@ -165,7 +167,7 @@ max_set_vel = 50
 max_start_vel = 50
 max_start_pos = 1000
 max_kp = 25
-max_ti = 250
+max_ti = 800
 max_td = 10
 max_force = generated_force(max_torque)
 
@@ -252,6 +254,7 @@ last_add_n_clicks = 0
 last_s_param_clicks = 0
 last_e_param_clicks = 0
 start = True
+previous_dropdown_value = ""
 
 layout1 = go.Layout(title='kształt przebytej trasy h(x)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='x [m]', tickformat='.2f'))
 layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
@@ -360,7 +363,7 @@ app.layout = dbc.Container(
                         marks=None,
                         tooltip={"placement" : "bottom", "always_visible" : True}
                     ),
-                    html.Label('maksymalna siła ciągu silnika [N]'),
+                    html.Label('maksymalna siła ciągu [N]'),
                     dcc.Slider(
                         id='v_slider5',
                         min=min_max_torque,
@@ -599,9 +602,10 @@ app.layout = dbc.Container(
         Input('s_slider8', 'value')
      ]
 )
+
 def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_clicks, s_param_clicks,
                  v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8):
-    global last_clr_n_clicks, last_add_n_clicks, last_s_param_clicks, last_e_param_clicks, traces, start
+    global last_clr_n_clicks, last_add_n_clicks, last_s_param_clicks, last_e_param_clicks, traces, start, previous_dropdown_value
 
     if route_dropdown == 'opt1':
         route = route_arc_tan
@@ -642,6 +646,7 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
 
     if dropdown == 'opt1':
         disabled = False
+        previous_dropdown_value = dropdown
     else:
         disabled = True
         if dropdown == 'opt2':
@@ -650,18 +655,33 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
             v2 = model_1_rolling_res_coef
             v4 = model_1_vehicle_mass
             v5 = model_1_max_torque
+            if previous_dropdown_value != dropdown:
+                previous_dropdown_value = dropdown
+                s6 = model_1_kp
+                s7 = model_1_ti
+                s8 = model_1_td
         elif dropdown == 'opt3':
             v1 = model_2_frontal_area
             v3 = model_2_wind_res_coef
             v2 = model_2_rolling_res_coef
             v4 = model_2_vehicle_mass
             v5 = model_2_max_torque
+            if previous_dropdown_value != dropdown:
+                previous_dropdown_value = dropdown
+                s6 = model_2_kp
+                s7 = model_2_ti
+                s8 = model_2_td
         elif dropdown == 'opt4':
             v1 = model_3_frontal_area
             v3 = model_3_wind_res_coef
             v2 = model_3_rolling_res_coef
             v4 = model_3_vehicle_mass
             v5 = model_3_max_torque
+            if previous_dropdown_value != dropdown:
+                previous_dropdown_value = dropdown
+                s6 = model_3_kp
+                s7 = model_3_ti
+                s8 = model_3_td
         modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     
     figures = [
@@ -670,7 +690,7 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
         {'data': traces[2], 'layout': layout3},
         {'data': traces[3], 'layout': layout4}
     ]
-    
+    print(previous_dropdown_value)
     return figures[0], figures[1], figures[2], figures[3], v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, disabled, disabled, disabled, disabled, disabled
 
 if __name__ == '__main__':
