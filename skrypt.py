@@ -41,11 +41,11 @@ def rolling_resistance(F):
     return F * rolling_res_coef
 
 def air_drag(v):
+    print(f"wrc: {wind_res_coef} | fa: {frontal_area} | v: {v} | airdrag: {0.5 * wind_res_coef * frontal_area * air_density * v * v}")
     return 0.5 * wind_res_coef * frontal_area * air_density * v * v
 
 def wind_force(v, wind_v):
-    global wind_angle
-    return air_drag(v - wind_v)
+    return air_drag(v - perpendicular_component(wind_v, wind_angle))
 
 def route_arc_tan(x):
     x -= 1000
@@ -53,19 +53,19 @@ def route_arc_tan(x):
 
 def route_sin(x):
     x -= 1000
-    return (math.sin(x / 400) + 1) * 5
+    return (math.sin(x / 400) + 1) * 20
 
 def route_sin_harmonic(x):
     x -= 1000
-    return (math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420) + 3) * 5
+    return (math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420) + 3) * 20
 
 def route_const(x):
     return 0
 
 #passat vlkswagen
 model_1_frontal_area = 2.1
-model_1_wind_res_coef = 0.29
-model_1_rolling_res_coef = 0.05
+model_1_wind_res_coef = 0.25
+model_1_rolling_res_coef = 0.01
 model_1_vehicle_mass = 1450
 model_1_max_torque = 420
 #model_1_kp = 2
@@ -74,8 +74,8 @@ model_1_max_torque = 420
 
 #ford super duty
 model_2_frontal_area = 2.8
-model_2_wind_res_coef = 0.33
-model_2_rolling_res_coef = 0.007
+model_2_wind_res_coef = 0.4
+model_2_rolling_res_coef = 0.02
 model_2_vehicle_mass = 2600
 model_2_max_torque = 1600.0
 #model_2_kp = 2
@@ -86,7 +86,7 @@ model_2_max_torque = 1600.0
 #volkswagen up
 model_3_frontal_area = 1.7
 model_3_wind_res_coef = 0.32
-model_3_rolling_res_coef = 0.004
+model_3_rolling_res_coef = 0.01
 model_3_vehicle_mass = 1080
 model_3_max_torque = 230.0
 
@@ -185,8 +185,8 @@ rolldown_arr = [rolldown(slope_arr[-1])]
 def set_global_variables(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     global frontal_area, wind_res_coef, rolling_res_coef, vehicle_mass , max_torque, max_force , air_density , g, wind_speed , wind_angle, t, ts, set_vel, route_func, start_vel, start_pos, kp, ti, td
     frontal_area = v1
-    wind_res_coef = v2
-    rolling_res_coef = v3
+    wind_res_coef = v3
+    rolling_res_coef = v2
     vehicle_mass = v4
     max_torque = v5
     max_force = generated_force(max_torque)
@@ -228,7 +228,7 @@ def compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s
         F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (ts / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (v_max)))
         F_motor_arr.append(F_motor)
         F_rolling = rolling_resistance(curr_slope)
-        F_drag = air_drag(vel_arr[-1])
+        F_drag =  air_drag(vel_arr[-1])
         F_wind = wind_force(vel_arr[-1], perpendicular_component(wind_speed, math.radians(wind_angle)))
         F_rolldown = rolldown(curr_slope)
         F_net = F_motor - F_rolling - F_drag - F_wind - F_rolldown
@@ -646,20 +646,20 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
         disabled = True
         if dropdown == 'opt2':
             v1 = model_1_frontal_area
-            v2 = model_1_wind_res_coef
-            v3 = model_1_rolling_res_coef
+            v3 = model_1_wind_res_coef
+            v2 = model_1_rolling_res_coef
             v4 = model_1_vehicle_mass
             v5 = model_1_max_torque
         elif dropdown == 'opt3':
             v1 = model_2_frontal_area
-            v2 = model_2_wind_res_coef
-            v3 = model_2_rolling_res_coef
+            v3 = model_2_wind_res_coef
+            v2 = model_2_rolling_res_coef
             v4 = model_2_vehicle_mass
             v5 = model_2_max_torque
         elif dropdown == 'opt4':
             v1 = model_3_frontal_area
-            v2 = model_3_wind_res_coef
-            v3 = model_3_rolling_res_coef
+            v3 = model_3_wind_res_coef
+            v2 = model_3_rolling_res_coef
             v4 = model_3_vehicle_mass
             v5 = model_3_max_torque
         modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
