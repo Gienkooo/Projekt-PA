@@ -44,7 +44,8 @@ def air_drag(v):
     return 0.5 * wind_res_coef * frontal_area * air_density * v * v
 
 def wind_force(v, wind_v):
-    return air_drag(v - perpendicular_component(wind_v, wind_angle))
+    global wind_angle
+    return air_drag(v - wind_v)
 
 def route_arc_tan(x):
     x -= 1000
@@ -66,7 +67,6 @@ model_1_frontal_area = 2.1
 model_1_wind_res_coef = 0.29
 model_1_rolling_res_coef = 0.05
 model_1_vehicle_mass = 1450
-model_1_wheel_radius = 0.35
 model_1_max_torque = 420
 model_1_kp = 2
 model_1_ti = 10
@@ -78,9 +78,9 @@ model_2_wind_res_coef = 0.33
 model_2_rolling_res_coef = 0.007
 model_2_vehicle_mass = 2600
 model_2_max_torque = 1600.0
-model_2_kp = 2
-model_2_ti = 14.4
-model_2_td = 0.05
+#model_2_kp = 2
+#model_2_ti = 14.4
+#model_2_td = 0.05
 
 
 #volkswagen up
