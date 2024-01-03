@@ -47,12 +47,15 @@ def wind_force(v, wind_v):
     return air_drag(v - perpendicular_component(wind_v, wind_angle))
 
 def route_arc_tan(x):
+    x -= 1000
     return (math.atan(x / 400) + math.pi / 2) * 10
 
 def route_sin(x):
+    x -= 1000
     return (math.sin(x / 400) + 1) * 5
 
 def route_sin_harmonic(x):
+    x -= 1000
     return (math.sin(x / 60) + math.sin(x / 120) + math.sin(x / 420) + 3) * 5
 
 def route_const(x):
@@ -142,7 +145,7 @@ t = 250 #s
 ts = 1 #s
 set_vel = 10 #
 start_vel = 0
-start_pos = -1000
+start_pos = 0
 kp = 2
 ti = 0.01
 td = 0.05
@@ -151,7 +154,7 @@ min_t = 100
 min_ts = 0.1
 min_set_vel = 0
 min_start_vel = 0
-min_start_pos = -1000
+min_start_pos = 0
 min_kp = 0.1
 min_ti = 0
 min_td = 0
@@ -160,7 +163,7 @@ max_t = 500
 max_ts = 10
 max_set_vel = 50
 max_start_vel = 50
-max_start_pos = 0
+max_start_pos = 1000
 max_kp = 10
 max_ti = 250
 max_td = 10
@@ -250,7 +253,7 @@ last_s_param_clicks = 0
 last_e_param_clicks = 0
 start = True
 
-layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
+layout1 = go.Layout(title='kształt przebytej trasy h(t)',yaxis=dict(title='h [m]', tickformat='.2f'),xaxis=dict(title='x [m]', tickformat='.2f'))
 layout2 = go.Layout(title='prędkość pojazdu v(t)',yaxis=dict(title='v [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 layout3 = go.Layout(title='siła ciągu silnika F(t)',yaxis=dict(title=u'F [kg · m/s²]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
 layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tickformat='.2f'),xaxis=dict(title='t [s]', tickformat='.2f'))
@@ -259,7 +262,7 @@ def add_new_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7
     compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
     x = [i for i in range(0, max_t + 1, s2)]
     new_trace1 = go.Scatter(
-        x=x,
+        x=pos_arr,
         y=h_arr,
         mode='lines',
     )
@@ -291,8 +294,8 @@ def modify_last_trace(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6
         traces[1][-1]['y'] = vel_arr
         traces[2][-1]['y'] = F_motor_arr
         traces[3][-1]['y'] = e_arr
-        traces[0][-1]['x'] = x
-        traces[1][-1]['x'] = x
+        traces[0][-1]['x'] = pos_arr
+        traces[1][-1]['x'] = x 
         traces[2][-1]['x'] = x
         traces[3][-1]['x'] = x
 
