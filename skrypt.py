@@ -279,23 +279,24 @@ layout4 = go.Layout(title='uchyb regulacji e(t)',yaxis=dict(title='e [m/s]', tic
 
 def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
+    x = [i for i in range(0, max_t + 1, s2)]
     new_trace1 = go.Scatter(
-        x=[i for i in range(max_t + 1)],
+        x=x,
         y=h_arr,
         mode='lines',
     )
     new_trace2 = go.Scatter(
-        x=[i for i in range(max_t + 1)],
+        x=x,
         y=vel_arr,
         mode='lines',
     )
     new_trace3 = go.Scatter(
-        x=[i for i in range(max_t + 1)],
+        x=x,
         y=F_motor_arr,
         mode='lines',
     )
     new_trace4 = go.Scatter(
-        x=[i for i in range(max_t + 1)],
+        x=x,
         y=e_arr,
         mode='lines',
     )
@@ -306,11 +307,16 @@ def add_new_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6
 
 def modify_last_trace(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    if traces[0] and traces[1] and traces[2]:
+    x = [i for i in range(0, max_t + 1, s2)]
+    if traces[0] and traces[1] and traces[2] and traces[3]:
         traces[0][-1]['y'] = h_arr
         traces[1][-1]['y'] = vel_arr
         traces[2][-1]['y'] = F_motor_arr
         traces[3][-1]['y'] = e_arr
+        traces[0][-1]['x'] = x
+        traces[1][-1]['x'] = x
+        traces[2][-1]['x'] = x
+        traces[3][-1]['x'] = x
 
 app.layout = dbc.Container(
     fluid=True,
