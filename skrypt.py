@@ -158,8 +158,8 @@ min_set_vel = 0
 min_start_vel = 0
 min_start_pos = -1000
 min_kp = 0.1
-min_ti = 0.1
-min_td = 0.00
+min_ti = 0
+min_td = 0
 
 max_t = 500
 max_ts = 10
@@ -226,7 +226,7 @@ def set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4,
 
 def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route):
     set_global_variables(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s7, s8, route)
-    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, F_motor_arr, slope_arr, rolldown_arr, route_func, max_set_vel
+    global time_array, vel_arr, pos_arr, h_arr, e_arr, es_arr, a_arr, a_obj_arr, F_arr, F_motor_arr, slope_arr, rolldown_arr, route_func, max_set_vel, max_force, vehicle_mass, rolling_res_coef, wind_res_coef, frontal_area, air_density
     time_array = [0]
     vel_arr = [start_vel]
     pos_arr = [start_pos]
@@ -239,12 +239,13 @@ def compute_values(v1, v2, v3, v4, v5, v6, e1, e2, e3, e4, s1, s2, s3, s4, s5, s
     F_motor_arr = [0]
     slope_arr = [slope(route_func, pos_arr[-1], 1)]
     rolldown_arr = [rolldown(slope_arr[-1])]
+    v_max = math.sqrt(max(2 * max_force - 2 * vehicle_mass * g * rolling_res_coef / wind_res_coef * frontal_area * air_density, 0.0000001))
     for _ in range(int(t / ts)):
         e_arr.append(set_vel - vel_arr[-1])
         es_arr.append(es_arr[-1] + e_arr[-1])
         curr_slope = slope(route_func, pos_arr[-1], 0.1 + vel_arr[-1] * ts)
         slope_arr.append(curr_slope)
-        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (set_vel)))
+        F_motor = max(-max_force, min(max_force, max_force * kp * (e_arr[-1] + (1 / ti) * es_arr[-1] + td * (e_arr[-1] - e_arr[-2]) / ts) / (v_max)))
         F_motor_arr.append(F_motor)
         F_rolling = rolling_resistance(curr_slope)
         F_drag = air_drag(vel_arr[-1])
