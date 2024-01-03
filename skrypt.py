@@ -219,7 +219,7 @@ def compute_values(v1, v2, v3, v4, v5, e1, e2, e3, e4, s1, s2, s3, s4, s5, s6, s
     F_motor_arr = [0]
     slope_arr = [slope(route_func, pos_arr[-1], 1)]
     rolldown_arr = [rolldown(slope_arr[-1])]
-    v_max = math.sqrt(max((2 * max_force - 2 * vehicle_mass * g * rolling_res_coef) / (wind_res_coef * frontal_area * air_density), 0.0000001))
+    v_max = math.sqrt(max((2 * max_force - 2 * vehicle_mass * g * rolling_res_coef) / (wind_res_coef * frontal_area * air_density), 0.000001))
     for _ in range(int(t / ts)):
         e_arr.append(set_vel - vel_arr[-1])
         es_arr.append(es_arr[-1] + e_arr[-1])
