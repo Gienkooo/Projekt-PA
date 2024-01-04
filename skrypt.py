@@ -134,11 +134,11 @@ max_wind_speed = 10.0
 max_wind_angle = 360.0
 
 #simulation parameters
-default_t = 250
+default_t = 500
 default_ts = 1
-default_set_vel = 10
-default_start_vel = 0
-default_start_pos = -1000
+default_set_vel = 0
+default_start_vel = 10
+default_start_pos = 0
 default_kp = 2
 default_ti = 70
 default_td = 0.5
@@ -639,9 +639,6 @@ def update_graph(dropdown, route_dropdown, add_n_clicks, clr_n_clicks, e_param_c
         s3 = default_set_vel
         s4 = default_start_vel
         s5 = default_start_pos
-        s6 = default_kp
-        s7 = default_ti
-        s8 = default_td
         last_s_param_clicks = s_param_clicks
 
     if dropdown == 'opt1':
