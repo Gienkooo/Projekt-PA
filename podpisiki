@@ -1,0 +1,51 @@
+Specyfikacja modeli
+1. VW Passet
+2. Ford Super Duty
+3. VW Up (Specyfikacja)
+
+Wykresiki
+1. Wyniki symulacji dla samochodu
+VW Passat na trasie arc tan,
+prędkość zadana 10 m/s
+o domyślnych nastawach regulatora
+(dobrze nastawiony)
+
+2. Wyniki symulacji dla samochodu
+VW Passat na trasie arc tan,
+prędkość zadana 10 m/s
+o nastawach regulatora
+kp = 12.5
+T_i = 4
+T_d = 4.581
+(przeregulowany)
+
+3. Wyniki symulacji dla samochodu
+VW Passat na trasie sinus,
+prędkość zadana 10 m/s
+o nastawach regulatora
+kp = 12.5
+T_i = 380
+T_d = 5
+(dobrze nastawiony, walczy)
+
+4. Wyniki symulacji dla samochodu
+VW Passat na trasie stała,
+prędkość zadana 10 m/s
+o domyślnych nastawach regulatora
+(dobrze nastawiony)
+
+5. Wyniki symulacji dla predefiniowanych
+modeli samochodow, każdy domyślnie nastawiony
+na trasie sinus
+trace 0 - VW Passat
+trace 1 - Ford Supet Duty
+trace 2 - VW Up
+(porównanie różnych modeli na tej samej trasie)
+
+6. Wynki symulacji dla VW Passata,
+domyślne nastawy regulatora, na trasie stałej
+dla różnych prędkości wiejącego wiatru
+trace 0 - próba kontrolna, brak wiatru
+trace 1 - wiatr wiejący w tył pojazdu z prędkością 10 m/s
+trace 2 - wiatr wiejący w przód pojazdu z prędkością 10 m/s
+(pokazanie wplywu wiatru)
