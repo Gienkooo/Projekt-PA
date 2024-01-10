@@ -154,18 +154,21 @@
  	\[
  		v_{max} = \sqrt{\frac{2F_{max} - 2mg\mu}{C_{d}A\rho}}
  	\]
-
-  \begin{table}[h]
+	\section{Przebieg symulacji}
+	Symulator umożliwia manualne dostosowanie parametrów opisanych w sekcji 2 i przedstawia przebieg symulacji na wykresach wybranych wartości symulowanego obiektu. W celu zilustrowania funkcji symulatora, przygotowaliśmy zestaw trzech pojazdów, którym przypisaliśmy odpowiednie parametry obiektu oraz przykładowe ustawienia regulatora.
+	
+ 	\begin{table}[h]
 		\centering
 		\begin{tabular}{|c|c|c|c|}
 			\hline
 			Parametry Modelu & VW Passat & Ford Super Duty & VW Up \\
 			\hline
+			\hline
 			Powierzchnia Czołowa [$m^2$] & 2,1 & 2,8 & 1,7 \\
 			\hline
 			Współczynnik Oporu Toczenia & 0,01 & 0,02 & 0,01 \\
 			\hline
-			{Masa Pojazdu [kg] & 1450 & 2600 & 1080 \\
+			Masa Pojazdu [kg] & 1450 & 2600 & 1080 \\
 			\hline
 			Maksymalna Siła Ciągu [N] & 833 & 2500 & 403 \\
 			\hline
@@ -179,4 +182,47 @@
 		\caption{Parametry Modeli Pojazdów oraz Nastawy Regulatora }
 		\label{tab:transposed_vehicle_parameters}
 	\end{table}
+	Symulacja pozwala na przeanalizowanie działania tempomatu dla trzech modeli pojazdów oraz czterech kształtów tras. Wspomniane model to VW Passat, Ford Super Duty oraz VW Up. Ich parametry zostały zamieszczone w Tabeli 1.
+	Możliwe kształty tras to: teren bez zmian wysokości, arcus tangens, sinus oraz sinus harmoniczny.
+	\subsection{Przykład 1 (dobrze nastawiony)}
+	Wyniki symulacji dla samochodu VW Passat na trasie arc tan, prędkość zadana 10 m/s o domyślnych nastawach regulatora.
+	
+	\includegraphics[width=0.9\linewidth]{"zrzut 1.png"}
+	\newpage
+	\subsection{Przykład 2 (przeregulowany)}
+	Wyniki symulacji dla samochodu VW Passat na trasie arc tan, prędkość zadana 10 m/s o nastawach regulatora: \\
+	$k_p = 12.5$ \\
+	$T_i = 4$ \\
+	$T_d = 4.581$ \\
+	
+	\includegraphics[width=0.9\linewidth]{"zrzut 2.png"}
+	\newpage
+	\subsection{Przykład 3 (dobrze nastawiony, wymagająca trasa)}
+	Wyniki symulacji dla samochodu VW Passat na trasie sinus, prędkość zadana 10 m/s o nastawach regulatora: \\
+	$k_p = 12.5$ \\
+	$T_i = 380$ \\ 
+	$T_d = 5$ \\
+	
+	\includegraphics[width=0.9\linewidth]{"zrzut 3.png"}
+	\newpage
+	\subsection{Przykład 4 (dobrze nastawiony)}
+	Wyniki symulacji dla samochodu VW Passat na trasie stała, prędkość zadana 10 m/s o domyślnych nastawach regulatora.
+	
+	\includegraphics[width=0.9\linewidth]{"zrzut 4.png"}
+	\newpage
+	\subsection{Przykład 5 (porównanie różnych modeli na tej samej trasie)}
+	Wyniki symulacji dla predefiniowanych modeli samochodow, każdy domyślnie nastawiony na trasie sinus. \\
+	trace 0 - VW Passat \\
+	trace 1 - Ford Supet Duty \\
+	trace 2 - VW Up \\
+	
+	\includegraphics[width=0.9\linewidth]{"zrzut 5.png"}
+	\newpage
+	\subsection{Przykład 6 (wpływ wiejącego wiatru)}
+	Wynki symulacji dla VW Passata, domyślne nastawy regulatora, na trasie stałej dla różnych prędkości wiejącego wiatru. \\
+	trace 0 - próba kontrolna, brak wiatru \\
+	trace 1 - wiatr wiejący w tył pojazdu z prędkością 10 m/s \\
+	trace 2 - wiatr wiejący w przód pojazdu z prędkością 10 m/s \\
+	
+	\includegraphics[width=0.9\linewidth]{"zrzut 6.png"}
 \end{document}

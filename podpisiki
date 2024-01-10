@@ -1,6 +1,6 @@
 Specyfikacja modeli:
 tabelka model\
-1. VW Passet
+1. VW Passat
 model__frontal_area = 2.1
 model__wind_res_coef = 0.25
 model__rolling_res_coef = 0.01
@@ -20,7 +20,7 @@ model__kp = 17
 model__ti = 215.0
 model__td = 2.0
 
-3. VW Up (Specyfikacja)
+3. VW Up
 model__frontal_area = 1.7
 model__wind_res_coef = 0.32
 model__rolling_res_coef = 0.01
