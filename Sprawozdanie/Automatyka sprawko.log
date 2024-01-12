@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.6.22)  11 JAN 2024 20:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2023.6.22)  12 JAN 2024 23:05
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -233,14 +233,19 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 12.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<regulator.png, id=1, 831.85782pt x 395.97937pt>
-File: regulator.png Graphic file (type png)
-<use regulator.png>
-Package pdftex.def Info: regulator.png  used on input line 15.
-(pdftex.def)             Requested size: 374.33257pt x 178.18907pt.
- [1
+<ehh.png, id=1, 966.61125pt x 466.74374pt>
+File: ehh.png Graphic file (type png)
+<use ehh.png>
+Package pdftex.def Info: ehh.png  used on input line 15.
+(pdftex.def)             Requested size: 434.97105pt x 210.03275pt.
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./regulator.png>] [2]
+Overfull \hbox (44.97105pt too wide) in paragraph at lines 15--16
+ [] 
+ []
+
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./ehh.png>] [2]
 Underfull \hbox (badness 10000) in paragraph at lines 98--99
 
  []
@@ -259,6 +264,7 @@ LaTeX Warning: Command \textdegree invalid in math mode on input line 123.
 LaTeX Warning: Command \textdegree invalid in math mode on input line 123.
 
 Missing character: There is no ° in font cmr12!
+[3]
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 131.
 
@@ -266,7 +272,7 @@ LaTeX Warning: Command \textdegree invalid in math mode on input line 131.
 LaTeX Warning: Command \textdegree invalid in math mode on input line 131.
 
 Missing character: There is no ° in font cmr12!
-[3]
+
 Underfull \hbox (badness 10000) in paragraph at lines 144--145
 
  []
@@ -281,76 +287,72 @@ Underfull \hbox (badness 10000) in paragraph at lines 147--148
 
  []
 
-
+[4]
 Underfull \hbox (badness 10000) in paragraph at lines 148--149
 
  []
 
-[4]
+[5]
 Overfull \hbox (0.65846pt too wide) in paragraph at lines 166--186
  [][] 
  []
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[5]
-<zrzut 1.png, id=35, 791.95876pt x 659.46375pt>
+<zrzut 1.png, id=37, 791.95876pt x 659.46375pt>
 File: zrzut 1.png Graphic file (type png)
 <use zrzut 1.png>
 Package pdftex.def Info: zrzut 1.png  used on input line 194.
 (pdftex.def)             Requested size: 350.99762pt x 292.27808pt.
- [6 <./zrzut 1.png>]
+[6] [7 <./zrzut 1.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 197--201
 
  []
 
-<zrzut 2.png, id=41, 783.67781pt x 668.4975pt>
+<zrzut 2.png, id=46, 783.67781pt x 668.4975pt>
 File: zrzut 2.png Graphic file (type png)
 <use zrzut 2.png>
 Package pdftex.def Info: zrzut 2.png  used on input line 202.
 (pdftex.def)             Requested size: 350.99762pt x 299.41344pt.
-[7 <./zrzut 2.png>]
+[8 <./zrzut 2.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 205--209
 
  []
 
-<zrzut 3.png, id=47, 790.45313pt x 652.68843pt>
+<zrzut 3.png, id=51, 790.45313pt x 652.68843pt>
 File: zrzut 3.png Graphic file (type png)
 <use zrzut 3.png>
 Package pdftex.def Info: zrzut 3.png  used on input line 210.
 (pdftex.def)             Requested size: 350.99762pt x 289.82298pt.
-[8 <./zrzut 3.png>]
-<zrzut 4.png, id=52, 779.91376pt x 651.18282pt>
+[9 <./zrzut 3.png>]
+<zrzut 4.png, id=56, 779.91376pt x 651.18282pt>
 File: zrzut 4.png Graphic file (type png)
 <use zrzut 4.png>
 Package pdftex.def Info: zrzut 4.png  used on input line 215.
 (pdftex.def)             Requested size: 350.99762pt x 293.05937pt.
- [9 <./zrzut 4.png>]
+ [10 <./zrzut 4.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 218--222
 
  []
 
-<zrzut 5.png, id=57, 803.25093pt x 652.68843pt>
+<zrzut 5.png, id=61, 803.25093pt x 652.68843pt>
 File: zrzut 5.png Graphic file (type png)
 <use zrzut 5.png>
 Package pdftex.def Info: zrzut 5.png  used on input line 223.
 (pdftex.def)             Requested size: 350.99762pt x 285.21187pt.
-[10 <./zrzut 5.png>]
+[11 <./zrzut 5.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 226--230
 
  []
 
-<zrzut 6.png, id=62, 803.25093pt x 654.19406pt>
+<zrzut 6.png, id=66, 803.25093pt x 654.19406pt>
 File: zrzut 6.png Graphic file (type png)
 <use zrzut 6.png>
 Package pdftex.def Info: zrzut 6.png  used on input line 231.
 (pdftex.def)             Requested size: 350.99762pt x 285.8698pt.
-[11 <./zrzut 6.png>] (./Automatyka sprawko.aux) ) 
+[12 <./zrzut 6.png>] (./Automatyka sprawko.aux) ) 
 Here is how much of TeX's memory you used:
  4433 strings out of 480212
- 69086 string characters out of 5895275
- 374557 words of memory out of 5000000
+ 69038 string characters out of 5895275
+ 370557 words of memory out of 5000000
  22317 multiletter control sequences out of 15000+600000
  482240 words of font info for 65 fonts, out of 8000000 for 9000
  34 hyphenation exceptions out of 8191
@@ -372,10 +374,10 @@ s/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1
 s/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cms
 y10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb
 >
-Output written on "Automatyka sprawko.pdf" (11 pages, 423694 bytes).
+Output written on "Automatyka sprawko.pdf" (12 pages, 422229 bytes).
 PDF statistics:
- 326 PDF objects out of 1000 (max. 8388607)
- 82 compressed objects within 1 object stream
+ 330 PDF objects out of 1000 (max. 8388607)
+ 84 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
